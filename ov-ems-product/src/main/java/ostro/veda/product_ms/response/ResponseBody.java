@@ -5,12 +5,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Accessors(chain = true)
 @Setter
 @Getter
 @NoArgsConstructor
-public class ResponsePayload<T> {
+public class ResponseBody<T> {
 
-    private String message;
-    private ResponseBody<T> body;
+    private List<T> data = new ArrayList<>();
 }

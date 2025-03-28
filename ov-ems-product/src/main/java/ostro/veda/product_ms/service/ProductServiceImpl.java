@@ -11,6 +11,7 @@ import ostro.veda.product_ms.exception.DocumentAlreadyExists;
 import ostro.veda.product_ms.exception.DocumentNotFound;
 import ostro.veda.product_ms.repository.ProductRepository;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -23,14 +24,29 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDto get(String name) {
+    public ProductDto getByName(String name) {
         Product product = productRepository.findByName(name)
                 .orElseThrow(() -> new DocumentNotFound("Product with name %s not found".formatted(name)));
         return toDto(product);
     }
 
     @Override
-    public void add(ProductDto productDto) {
+    public List<ProductDto> getByCategories(String category) {
+        List<Product> product = productRepository.findByCategoryName(category);
+
+        if (product.isEmpty()) throw new DocumentNotFound("Product with category %s not found".formatted(category));
+        return toDto(product);
+    }
+
+    @Override
+    public ProductDto getByUuid(String uuid) {
+        Product product = productRepository.findByUuid(uuid)
+                .orElseThrow(() -> new DocumentNotFound("Product with uuid %s not found".formatted(uuid)));
+        return toDto(product);
+    }
+
+    @Override
+    public String add(ProductDto productDto) {
         boolean productExists = productRepository.findByName(productDto.getName())
                 .isPresent();
 
@@ -38,7 +54,12 @@ public class ProductServiceImpl implements ProductService {
                 .formatted(productDto.getName()));
 
         Product product = build(productDto);
-        productRepository.save(product);
+        return productRepository.save(product).getUuid();
+    }
+
+    @Override
+    public String update(ProductDto productDto) {
+        return "";
     }
 
     @Override
@@ -65,9 +86,16 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public List<ProductDto> toDto(List<Product> products) {
+        return products.stream()
+                .map(this::toDto)
+                .toList();
+    }
+
+    @Override
     public ProductDto toDto(Product product) {
         return new ProductDto()
-                .setUuid(UUID.randomUUID().toString())
+                .setUuid(product.getUuid())
                 .setName(product.getName())
                 .setDescription(product.getDescription())
                 .setPrice(product.getPrice())
