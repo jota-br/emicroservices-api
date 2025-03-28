@@ -1,0 +1,11 @@
+spring:
+  data:
+    mongodb:
+#      uri: mongodb://${MONGO_USER}:${MONGO_PASS}@localhost:27017/
+      uri: mongodb://${MONGO_USER}:${MONGO_PASS}@${MONGO_URL}:27017/${MONGO_COLLECTION}
+      database: product
+
+controller:
+  defaults:
+    mapping-prefix: /api
+    current-version-suffix: /v1
