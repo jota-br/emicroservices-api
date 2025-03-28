@@ -1,4 +1,4 @@
-package ostro.veda.product_ms.document;
+package ostro.veda.product_ms.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +9,7 @@ import lombok.experimental.Accessors;
 @Setter
 @Getter
 @NoArgsConstructor
-public class Category {
+public class CategoryDto {
 
     private String name;
     private String description;

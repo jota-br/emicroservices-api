@@ -1,4 +1,4 @@
-package ostro.veda.product_ms.document;
+package ostro.veda.product_ms.response;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,9 +9,8 @@ import lombok.experimental.Accessors;
 @Setter
 @Getter
 @NoArgsConstructor
-public class Category {
+public class ResponsePayload<T> {
 
-    private String name;
-    private String description;
-    private boolean isActive;
+    private String message;
+    private T body;
 }
