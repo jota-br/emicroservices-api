@@ -20,7 +20,7 @@ public class ProductController {
     private ProductServiceImpl productService;
 
     @GetMapping("/{name}")
-    public ResponseEntity<ResponsePayload<ProductDto>> getByName(@PathVariable("name") String name) {
+    public ResponseEntity<ResponsePayload<ProductDto>> getByName(@PathVariable("name") final String name) {
         ProductDto productDto = productService.getByName(name);
         return ResponseEntity.ok(new ResponsePayload<ProductDto>()
                 .setMessage("Product found")
@@ -30,7 +30,7 @@ public class ProductController {
     }
 
     @GetMapping("/category/{category}")
-    public ResponseEntity<ResponsePayload<ProductDto>> getByCategory(@PathVariable("category") String category) {
+    public ResponseEntity<ResponsePayload<ProductDto>> getByCategory(@PathVariable("category") final String category) {
         List<ProductDto> productDto = productService.getByCategories(category);
         return ResponseEntity.ok(
                 new ResponsePayload<ProductDto>()
@@ -41,7 +41,7 @@ public class ProductController {
     }
 
     @GetMapping("/uuid/{uuid}")
-    public ResponseEntity<ResponsePayload<ProductDto>> getByUuid(@PathVariable("uuid") String uuid) {
+    public ResponseEntity<ResponsePayload<ProductDto>> getByUuid(@PathVariable("uuid") final String uuid) {
         ProductDto productDto = productService.getByUuid(uuid);
         return ResponseEntity.ok(new ResponsePayload<ProductDto>()
                 .setMessage("Product found")
@@ -51,7 +51,7 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<ResponsePayload<ProductDto>> add(@RequestBody ProductDto productDto) {
+    public ResponseEntity<ResponsePayload<ProductDto>> add(@RequestBody final ProductDto productDto) {
         String uuid = productService.add(productDto);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()

@@ -24,14 +24,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDto getByName(String name) {
+    public ProductDto getByName(final String name) {
         Product product = productRepository.findByName(name)
                 .orElseThrow(() -> new DocumentNotFound("Product with name %s not found".formatted(name)));
         return toDto(product);
     }
 
     @Override
-    public List<ProductDto> getByCategories(String category) {
+    public List<ProductDto> getByCategories(final String category) {
         List<Product> product = productRepository.findByCategoryName(category);
 
         if (product.isEmpty()) throw new DocumentNotFound("Product with category %s not found".formatted(category));
@@ -39,7 +39,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDto getByUuid(String uuid) {
+    public ProductDto getByUuid(final String uuid) {
         Product product = productRepository.findByUuid(uuid)
                 .orElseThrow(() -> new DocumentNotFound("Product with uuid %s not found".formatted(uuid)));
         return toDto(product);
@@ -58,12 +58,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public String update(ProductDto productDto) {
+    public String update(final ProductDto productDto) {
         return "";
     }
 
     @Override
-    public Product build(ProductDto productDto) {
+    public Product build(final ProductDto productDto) {
         return new Product()
                 .setUuid(UUID.randomUUID().toString())
                 .setName(productDto.getName())
@@ -86,31 +86,37 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductDto> toDto(List<Product> products) {
+    public List<ProductDto> toDto(final List<Product> products) {
         return products.stream()
                 .map(this::toDto)
                 .toList();
     }
 
     @Override
-    public ProductDto toDto(Product product) {
-        return new ProductDto()
-                .setUuid(product.getUuid())
-                .setName(product.getName())
-                .setDescription(product.getDescription())
-                .setPrice(product.getPrice())
-                .setStock(product.getStock())
-                .setActive(product.isActive())
-                .setCategories(product.getCategories().stream()
-                        .map(categoryDto -> new CategoryDto()
-                                .setName(categoryDto.getName())
-                                .setDescription(categoryDto.getDescription())
-                                .setActive(categoryDto.isActive()))
+    public ProductDto toDto(final Product product) {
+        return ProductDto
+                .builder()
+                .uuid(product.getUuid())
+                .name(product.getName())
+                .description(product.getDescription())
+                .price(product.getPrice())
+                .stock(product.getStock())
+                .isActive(product.isActive())
+                .categories(product.getCategories().stream()
+                        .map(categoryDto -> CategoryDto
+                                .builder()
+                                .name(categoryDto.getName())
+                                .description(categoryDto.getDescription())
+                                .isActive(categoryDto.isActive())
+                                .build())
                         .toList())
-                .setImages(product.getImages().stream()
-                        .map(imageDto -> new ImageDto()
-                                .setImagePath(imageDto.getImagePath())
-                                .setMain(imageDto.isMain()))
-                        .toList());
+                .images(product.getImages().stream()
+                        .map(imageDto -> ImageDto
+                                .builder()
+                                .imagePath(imageDto.getImagePath())
+                                .isMain(imageDto.isMain())
+                                .build())
+                        .toList())
+                .build();
     }
 }

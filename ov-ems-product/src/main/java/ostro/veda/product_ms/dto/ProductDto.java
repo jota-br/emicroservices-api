@@ -1,26 +1,25 @@
 package ostro.veda.product_ms.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 @Accessors(chain = true)
-@Setter
 @Getter
-@NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class ProductDto {
 
-    private String uuid;
-    private String name;
-    private String description;
-    private BigDecimal price;
-    private Integer stock;
-    private boolean isActive;
-    private List<CategoryDto> categories = new ArrayList<>();
-    private List<ImageDto> images = new ArrayList<>();
+    private final String uuid;
+    private final String name;
+    private final String description;
+    private final BigDecimal price;
+    private final Integer stock;
+    private final boolean isActive;
+    private final List<CategoryDto> categories;
+    private final List<ImageDto> images;
 }
