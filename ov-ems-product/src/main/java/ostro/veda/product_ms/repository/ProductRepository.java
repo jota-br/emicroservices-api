@@ -9,6 +9,8 @@ import java.util.Optional;
 
 public interface ProductRepository extends MongoRepository<Product, String> {
 
+    boolean existsByUuid(String uuid);
+
     Optional<Product> findByName(String name);
 
     @Query("{ 'categories.name': ?0}")

@@ -1,8 +1,8 @@
 package ostro.veda.product_ms.document;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -12,34 +12,33 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Accessors(chain = true)
-@Setter
 @Getter
-@NoArgsConstructor
+@Builder
+@AllArgsConstructor
 @Document(collection = "product")
 public class Product {
 
     @Id
-    private String id;
-    private String uuid;
-    private String name;
-    private String description;
-    private BigDecimal price;
-    private Integer stock;
-    private boolean isActive;
+    private final String id;
+    private final String uuid;
+    private final String name;
+    private final String description;
+    private final BigDecimal price;
+    private final Integer stock;
+    private final boolean isActive;
 
     @Version
-    private int version;
+    private final int version;
 
     @CreatedDate
-    private LocalDateTime createdAt;
+    private final LocalDateTime createdAt;
 
     @LastModifiedDate
-    private LocalDateTime updatedAt;
+    private final LocalDateTime updatedAt;
 
-    private List<Category> categories = new ArrayList<>();
-    private List<Image> images = new ArrayList<>();
+    private final List<Category> categories;
+    private final List<Image> images;
 }

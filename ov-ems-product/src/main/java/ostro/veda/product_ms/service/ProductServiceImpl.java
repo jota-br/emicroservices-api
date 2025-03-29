@@ -1,14 +1,17 @@
 package ostro.veda.product_ms.service;
 
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import ostro.veda.product_ms.document.Category;
 import ostro.veda.product_ms.document.Image;
 import ostro.veda.product_ms.document.Product;
-import ostro.veda.product_ms.dto.CategoryDto;
-import ostro.veda.product_ms.dto.ImageDto;
-import ostro.veda.product_ms.dto.ProductDto;
-import ostro.veda.product_ms.exception.DocumentAlreadyExists;
-import ostro.veda.product_ms.exception.DocumentNotFound;
+import ostro.veda.product_ms.dto.*;
+import ostro.veda.product_ms.handler.DocumentAlreadyExistsException;
+import ostro.veda.product_ms.handler.DocumentNotFoundException;
+import ostro.veda.product_ms.handler.InvalidDataException;
 import ostro.veda.product_ms.repository.ProductRepository;
 
 import java.util.List;
@@ -18,15 +21,17 @@ import java.util.UUID;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
+    private final MongoTemplate mongoTemplate;
 
-    public ProductServiceImpl(ProductRepository productRepository) {
+    public ProductServiceImpl(ProductRepository productRepository, MongoTemplate mongoTemplate) {
         this.productRepository = productRepository;
+        this.mongoTemplate = mongoTemplate;
     }
 
     @Override
     public ProductDto getByName(final String name) {
         Product product = productRepository.findByName(name)
-                .orElseThrow(() -> new DocumentNotFound("Product with name %s not found".formatted(name)));
+                .orElseThrow(() -> new DocumentNotFoundException("Product with name %s not found".formatted(name)));
         return toDto(product);
     }
 
@@ -34,14 +39,14 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductDto> getByCategories(final String category) {
         List<Product> product = productRepository.findByCategoryName(category);
 
-        if (product.isEmpty()) throw new DocumentNotFound("Product with category %s not found".formatted(category));
+        if (product.isEmpty()) throw new DocumentNotFoundException("Product with category %s not found".formatted(category));
         return toDto(product);
     }
 
     @Override
     public ProductDto getByUuid(final String uuid) {
         Product product = productRepository.findByUuid(uuid)
-                .orElseThrow(() -> new DocumentNotFound("Product with uuid %s not found".formatted(uuid)));
+                .orElseThrow(() -> new DocumentNotFoundException("Product with uuid %s not found".formatted(uuid)));
         return toDto(product);
     }
 
@@ -50,7 +55,7 @@ public class ProductServiceImpl implements ProductService {
         boolean productExists = productRepository.findByName(productDto.getName())
                 .isPresent();
 
-        if (productExists) throw new DocumentAlreadyExists("Product with name %s already exists"
+        if (productExists) throw new DocumentAlreadyExistsException("Product with name %s already exists"
                 .formatted(productDto.getName()));
 
         Product product = build(productDto);
@@ -58,42 +63,103 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public String update(final ProductDto productDto) {
-        return "";
+    public void update(final ProductDto productDto) {
+        boolean exists = productRepository.existsByUuid(productDto.getUuid());
+
+        if (!exists) throw new DocumentNotFoundException("Product with uuid %s not found".formatted(productDto.getUuid()));
+
+        QueryAndUpdate queryAndUpdate = getQueryAndUpdate(productDto);
+
+        mongoTemplate.updateFirst(queryAndUpdate.query(), queryAndUpdate.update(), Product.class);
     }
 
     @Override
-    public Product build(final ProductDto productDto) {
-        return new Product()
-                .setUuid(UUID.randomUUID().toString())
-                .setName(productDto.getName())
-                .setDescription(productDto.getDescription())
-                .setPrice(productDto.getPrice())
-                .setStock(productDto.getStock())
-                .setActive(productDto.isActive())
-                .setCategories(productDto.getCategories().stream()
-                        .map(categoryDto -> new Category()
-                                .setName(categoryDto.getName())
-                                .setDescription(categoryDto.getDescription())
-                                .setActive(categoryDto.isActive()))
+    public void updatePriceAndStock(ProductPriceAndStockDto productPriceAndStockDto) {
+        boolean exists = productRepository.existsByUuid(productPriceAndStockDto.getUuid());
+
+        if (!exists)
+            throw new DocumentNotFoundException("Product with uuid %s not found".formatted(productPriceAndStockDto.getUuid()));
+
+        final double MINIMUM_PRICE = 0.0;
+        final int MINIMUM_STOCK = 0;
+
+        if (productPriceAndStockDto.getStock() < MINIMUM_STOCK && productPriceAndStockDto.getPrice().doubleValue() < MINIMUM_PRICE) {
+            throw new InvalidDataException("Stock and Price need to be 0 or greater");
+        }
+
+        Query query = new Query(Criteria.where("uuid").is(productPriceAndStockDto.getUuid()));
+        Update update = new Update();
+
+        if (productPriceAndStockDto.getStock() >= MINIMUM_STOCK)
+            update.set("stock", productPriceAndStockDto.getStock());
+
+        if (productPriceAndStockDto.getPrice().doubleValue() >= MINIMUM_PRICE)
+            update.set("price", productPriceAndStockDto.getPrice());
+
+        mongoTemplate.updateFirst(query, update, Product.class);
+    }
+
+    private QueryAndUpdate getQueryAndUpdate(ProductDto productDto) {
+        Query query = new Query(Criteria.where("uuid").is(productDto.getUuid()));
+        Update update = new Update()
+                .set("name", productDto.getName())
+                .set("description", productDto.getDescription())
+                .set("isActive", productDto.isActive())
+                .set("categories", productDto.getCategories().stream()
+                        .map(categoryDto -> Category
+                                .builder()
+                                .name(categoryDto.getName())
+                                .description(categoryDto.getDescription())
+                                .isActive(categoryDto.isActive())
+                                .build())
                         .toList())
-                .setImages(productDto.getImages().stream()
-                        .map(imageDto -> new Image()
-                                .setImagePath(imageDto.getImagePath())
-                                .setMain(imageDto.isMain()))
+                .set("images", productDto.getImages().stream()
+                        .map(imageDto -> Image
+                                .builder()
+                                .imagePath(imageDto.getImagePath())
+                                .isMain(imageDto.isMain())
+                                .build())
                         .toList());
-
+        return new QueryAndUpdate(query, update);
     }
 
-    @Override
-    public List<ProductDto> toDto(final List<Product> products) {
+    private record QueryAndUpdate(Query query, Update update) {
+    }
+
+    private Product build(final ProductDto productDto) {
+        return Product
+                .builder()
+                .uuid(UUID.randomUUID().toString())
+                .name(productDto.getName())
+                .description(productDto.getDescription())
+                .price(productDto.getPrice())
+                .stock(productDto.getStock())
+                .isActive(productDto.isActive())
+                .categories(productDto.getCategories().stream()
+                        .map(categoryDto -> Category
+                                .builder()
+                                .name(categoryDto.getName())
+                                .description(categoryDto.getDescription())
+                                .isActive(categoryDto.isActive())
+                                .build())
+                        .toList())
+                .images(productDto.getImages().stream()
+                        .map(imageDto -> Image
+                                .builder()
+                                .imagePath(imageDto.getImagePath())
+                                .isMain(imageDto.isMain())
+                                .build())
+                        .toList())
+                .build();
+    }
+
+    private List<ProductDto> toDto(final List<Product> products) {
         return products.stream()
                 .map(this::toDto)
                 .toList();
     }
 
-    @Override
-    public ProductDto toDto(final Product product) {
+    private ProductDto toDto(final Product product) {
         return ProductDto
                 .builder()
                 .uuid(product.getUuid())

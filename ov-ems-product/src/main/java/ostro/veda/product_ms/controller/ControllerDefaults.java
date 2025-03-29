@@ -7,6 +7,6 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "controller.defaults")
 public class ControllerDefaults {
 
-    public static String mappingPrefix;
-    public static String currentVersionSuffix;
+    public static final String MAPPING_PREFIX = "/api";
+    public static final String MAPPING_VERSION_SUFFIX = "/v1";
 }
