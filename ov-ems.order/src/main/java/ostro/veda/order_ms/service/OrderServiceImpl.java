@@ -1,14 +1,19 @@
 package ostro.veda.order_ms.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
-import ostro.veda.order_ms.dto.OrderCreationDto;
+import ostro.veda.order_ms.dto.*;
 import ostro.veda.order_ms.model.Order;
 import ostro.veda.order_ms.model.OrderDetail;
+import ostro.veda.order_ms.model.OrderStatus;
 import ostro.veda.order_ms.model.OrderStatusHistory;
 import ostro.veda.order_ms.repository.OrderRepository;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -26,7 +31,58 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order build(final OrderCreationDto orderCreationDto) {
+    public OrderDto getByOrderUuid(String uuid) {
+        Order order = orderRepository.findByUuid(uuid)
+                .orElseThrow(() -> new EntityNotFoundException("Order with uuid %s not found".formatted(uuid)));
+        return toDto(order);
+    }
+
+    @Override
+    public List<OrderDto> getByUserUuid(String uuid) {
+        List<Order> orders = orderRepository.findByUserUuid(uuid);
+
+        if(orders.isEmpty()) throw  new EntityNotFoundException("No Order found with user uuid %s".formatted(uuid));
+
+        return orders.stream().map(this::toDto).toList();
+    }
+
+    @Override
+    public void updateOrderStatus(final OrderStatusUpdateDto orderStatusUpdateDto) {
+        Order order = orderRepository.findByUuid(orderStatusUpdateDto.getUuid())
+                .orElseThrow(() -> new EntityNotFoundException("Order with uuid %s not found".formatted(orderStatusUpdateDto.getUuid())));
+
+        updateOrderStatus(orderStatusUpdateDto.getStatus(), order);
+
+        orderRepository.save(order);
+    }
+
+    @Override
+    public void cancelOrder(String uuid) {
+        Order order = orderRepository.findByUuid(uuid)
+                .orElseThrow(() -> new EntityNotFoundException("Order with uuid %s not found".formatted(uuid)));
+
+        updateOrderStatus(OrderStatus.CANCELLED, order);
+        buildOrderDetailsToCancel(order.getOrderDetails());
+        orderRepository.save(order);
+    }
+
+    @Override
+    public void returnItem(OrderReturnItemDto orderReturnItemDto) {
+        Order order = orderRepository.findByUuid(orderReturnItemDto.getOrderUuid())
+                .orElseThrow(() -> new EntityNotFoundException("Order with uuid %s not found".formatted(orderReturnItemDto.getOrderUuid())));
+
+        if (LocalDateTime.now().isBefore(order.getOrderDate().minusDays(30)))
+            throw new IllegalStateException("Order cannot be returned");
+
+        updateOrderStatus(OrderStatus.RETURN_REQUESTED, order);
+        order.getOrderDetails().add(
+                buildOrderDetailToReturn(orderReturnItemDto, order)
+        );
+
+        orderRepository.save(order);
+    }
+
+    private Order build(final OrderCreationDto orderCreationDto) {
         Order order = Order
                 .builder()
                 .uuid(UUID.randomUUID().toString())
@@ -42,7 +98,7 @@ public class OrderServiceImpl implements OrderService {
                 .map(orderDetailDto -> OrderDetail
                         .builder()
                         .uuid(UUID.randomUUID().toString())
-                        .productUuid(orderDetailDto.getProduct_uuid())
+                        .productUuid(orderDetailDto.getProductUuid())
                         .productName(orderDetailDto.getProductName())
                         .quantity(orderDetailDto.getQuantity())
                         .unitPrice(orderDetailDto.getUnitPrice())
@@ -52,16 +108,92 @@ public class OrderServiceImpl implements OrderService {
                 .toList();
 
         List<OrderStatusHistory> orderStatusHistories = (List.of(
-                OrderStatusHistory
-                        .builder()
-                        .uuid(UUID.randomUUID().toString())
-                        .orderStatus(orderCreationDto.getStatus())
-                        .order(order)
-                        .build()
+                buildOrderStatusHistory(order.getStatus(), order)
         ));
 
         return order
                 .setOrderDetails(orderDetails)
                 .setOrderStatusHistories(orderStatusHistories);
+    }
+
+    private void updateOrderStatus(OrderStatus orderStatus, Order order) {
+        order.setStatus(orderStatus);
+        OrderStatusHistory orderStatusHistory = buildOrderStatusHistory(orderStatus, order);
+        order.getOrderStatusHistories().add(orderStatusHistory);
+    }
+
+    private OrderStatusHistory buildOrderStatusHistory(OrderStatus orderStatus, Order order) {
+        return OrderStatusHistory
+                .builder()
+                .uuid(UUID.randomUUID().toString())
+                .orderStatus(orderStatus)
+                .order(order)
+                .build();
+    }
+
+    private void buildOrderDetailsToCancel(List<OrderDetail> orderDetails) {
+        orderDetails.addAll(
+                orderDetails
+                        .stream()
+                        .map(buildOrderDetailToCancel())
+                        .toList()
+        );
+    }
+
+    private Function<OrderDetail, OrderDetail> buildOrderDetailToCancel() {
+        return orderDetail -> OrderDetail
+                .builder()
+                .uuid(UUID.randomUUID().toString())
+                .productUuid(orderDetail.getProductUuid())
+                .productName(orderDetail.getProductName())
+                .quantity(-orderDetail.getQuantity())
+                .unitPrice(orderDetail.getUnitPrice().subtract(orderDetail.getUnitPrice().multiply(BigDecimal.valueOf(2))))
+                .order(orderDetail.getOrder())
+                .build();
+    }
+
+    private OrderDetail buildOrderDetailToReturn(OrderReturnItemDto orderReturnItemDto, Order order) {
+        return OrderDetail
+                .builder()
+                .uuid(UUID.randomUUID().toString())
+                .productUuid(orderReturnItemDto.getProductUuid())
+                .productName(orderReturnItemDto.getProductName())
+                .quantity(-orderReturnItemDto.getQuantity())
+                .unitPrice(orderReturnItemDto.getUnitPrice().subtract(orderReturnItemDto.getUnitPrice().multiply(BigDecimal.valueOf(2))))
+                .order(order)
+                .build();
+    }
+
+    private OrderDto toDto(Order order) {
+        return OrderDto.builder()
+                .uuid(UUID.randomUUID().toString())
+                .userUuid(order.getUserUuid())
+                .userEmail(order.getUserEmail())
+                .shippingAddress(order.getShippingAddress())
+                .billingAddress(order.getBillingAddress())
+                .totalAmount(order.getTotalAmount())
+                .status(order.getStatus())
+                .orderDetails(order.getOrderDetails()
+                        .stream()
+                        .map(orderDetail -> OrderDetailDto
+                                .builder()
+                                .uuid(order.getUuid())
+                                .productUuid(orderDetail.getProductUuid())
+                                .productName(orderDetail.getProductName())
+                                .quantity(orderDetail.getQuantity())
+                                .unitPrice(orderDetail.getUnitPrice())
+                                .orderId(order.getId())
+                                .build())
+                        .toList())
+                .orderStatusHistories(order.getOrderStatusHistories()
+                        .stream()
+                        .map(orderStatusHistory -> OrderStatusHistoryDto
+                                .builder()
+                                .uuid(orderStatusHistory.getUuid())
+                                .orderStatus(orderStatusHistory.getOrderStatus())
+                                .orderId(order.getId())
+                                .build())
+                        .toList())
+                .build();
     }
 }

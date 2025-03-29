@@ -11,12 +11,12 @@ import java.math.BigDecimal;
 @Getter
 @Builder
 @AllArgsConstructor
-public class OrderDetailDto {
+public class OrderReturnItemDto {
 
-    private final String uuid;
-    private final long orderId;
+    private final String orderUuid;
     private final String productUuid;
     private final String productName;
     private final int quantity;
     private final BigDecimal unitPrice;
+
 }
