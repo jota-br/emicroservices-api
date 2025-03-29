@@ -19,8 +19,8 @@ RESTful API for adding and retrieving products, placing orders and authenticate 
     - [x] Repository
     - [ ] Validation
 - Order
-    - [ ] Controller
-    - [ ] ExceptionHandler
-    - [ ] Service
-    - [ ] Repository
+    - [x] Controller
+    - [x] ExceptionHandler
+    - [x] Service
+    - [x] Repository
     - [ ] Validation
