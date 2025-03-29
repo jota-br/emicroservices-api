@@ -1,7 +1,7 @@
 package ostro.veda.product_ms.service;
 
 import ostro.veda.product_ms.dto.ProductDto;
-import ostro.veda.product_ms.dto.ProductPriceAndStockDto;
+import ostro.veda.product_ms.dto.ProductPriceDto;
 
 import java.util.List;
 
@@ -17,5 +17,5 @@ public interface ProductService {
 
     void update(ProductDto productDto);
 
-    void updatePriceAndStock(ProductPriceAndStockDto productPriceAndStockDto);
+    void updatePrice(ProductPriceDto productPriceDto);
 }

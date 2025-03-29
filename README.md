@@ -19,8 +19,8 @@ Update all `Product's` fields except price and stock.
 Returns 204 No Content (success).
 
 `PUT` </br>
-`/api/v1/product/update/priceAndStock/{uuid}`</br>
-Updates `Product` price and stock.
+`/api/v1/product/update/price/{uuid}`</br>
+Updates `Product` price.
 Returns 204 No Content (success).
 
 `POST` </br>

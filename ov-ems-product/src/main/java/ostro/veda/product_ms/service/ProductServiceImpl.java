@@ -8,10 +8,12 @@ import org.springframework.stereotype.Service;
 import ostro.veda.product_ms.document.Category;
 import ostro.veda.product_ms.document.Image;
 import ostro.veda.product_ms.document.Product;
-import ostro.veda.product_ms.dto.*;
+import ostro.veda.product_ms.dto.CategoryDto;
+import ostro.veda.product_ms.dto.ImageDto;
+import ostro.veda.product_ms.dto.ProductDto;
+import ostro.veda.product_ms.dto.ProductPriceDto;
 import ostro.veda.product_ms.handler.DocumentAlreadyExistsException;
 import ostro.veda.product_ms.handler.DocumentNotFoundException;
-import ostro.veda.product_ms.handler.InvalidDataException;
 import ostro.veda.product_ms.repository.ProductRepository;
 
 import java.util.List;
@@ -74,27 +76,19 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void updatePriceAndStock(ProductPriceAndStockDto productPriceAndStockDto) {
-        boolean exists = productRepository.existsByUuid(productPriceAndStockDto.getUuid());
+    public void updatePrice(ProductPriceDto productPriceDto) {
+        boolean exists = productRepository.existsByUuid(productPriceDto.getUuid());
 
         if (!exists)
-            throw new DocumentNotFoundException("Product with uuid %s not found".formatted(productPriceAndStockDto.getUuid()));
+            throw new DocumentNotFoundException("Product with uuid %s not found".formatted(productPriceDto.getUuid()));
 
         final double MINIMUM_PRICE = 0.0;
-        final int MINIMUM_STOCK = 0;
 
-        if (productPriceAndStockDto.getStock() < MINIMUM_STOCK && productPriceAndStockDto.getPrice().doubleValue() < MINIMUM_PRICE) {
-            throw new InvalidDataException("Stock and Price need to be 0 or greater");
-        }
-
-        Query query = new Query(Criteria.where("uuid").is(productPriceAndStockDto.getUuid()));
+        Query query = new Query(Criteria.where("uuid").is(productPriceDto.getUuid()));
         Update update = new Update();
 
-        if (productPriceAndStockDto.getStock() >= MINIMUM_STOCK)
-            update.set("stock", productPriceAndStockDto.getStock());
-
-        if (productPriceAndStockDto.getPrice().doubleValue() >= MINIMUM_PRICE)
-            update.set("price", productPriceAndStockDto.getPrice());
+        if (productPriceDto.getPrice().doubleValue() >= MINIMUM_PRICE)
+            update.set("price", productPriceDto.getPrice());
 
         mongoTemplate.updateFirst(query, update, Product.class);
     }
@@ -133,7 +127,6 @@ public class ProductServiceImpl implements ProductService {
                 .name(productDto.getName())
                 .description(productDto.getDescription())
                 .price(productDto.getPrice())
-                .stock(productDto.getStock())
                 .isActive(productDto.isActive())
                 .categories(productDto.getCategories().stream()
                         .map(categoryDto -> Category
@@ -166,7 +159,6 @@ public class ProductServiceImpl implements ProductService {
                 .name(product.getName())
                 .description(product.getDescription())
                 .price(product.getPrice())
-                .stock(product.getStock())
                 .isActive(product.isActive())
                 .categories(product.getCategories().stream()
                         .map(categoryDto -> CategoryDto

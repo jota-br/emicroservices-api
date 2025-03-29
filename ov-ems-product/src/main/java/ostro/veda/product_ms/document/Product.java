@@ -27,7 +27,6 @@ public class Product {
     private final String name;
     private final String description;
     private final BigDecimal price;
-    private final Integer stock;
     private final boolean isActive;
 
     @Version

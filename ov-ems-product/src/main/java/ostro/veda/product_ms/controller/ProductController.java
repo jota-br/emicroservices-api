@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ostro.veda.product_ms.dto.ProductDto;
-import ostro.veda.product_ms.dto.ProductPriceAndStockDto;
+import ostro.veda.product_ms.dto.ProductPriceDto;
 import ostro.veda.product_ms.response.ResponseBody;
 import ostro.veda.product_ms.response.ResponsePayload;
 import ostro.veda.product_ms.service.ProductService;
@@ -82,11 +82,11 @@ public class ProductController {
                 );
     }
 
-    @PutMapping("/update/priceAndStock/{uuid}")
-    public ResponseEntity<ResponsePayload<ProductDto>> updatePriceAndStock(
-            @RequestBody final ProductPriceAndStockDto productPriceAndStockDto
+    @PutMapping("/update/price/{uuid}")
+    public ResponseEntity<ResponsePayload<ProductDto>> updatePrice(
+            @RequestBody final ProductPriceDto productPriceDto
     ) {
-        productService.updatePriceAndStock(productPriceAndStockDto);
+        productService.updatePrice(productPriceDto);
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
                 .body(
