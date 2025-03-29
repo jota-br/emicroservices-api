@@ -10,5 +10,11 @@ RESTful API for adding and retrieving products, placing orders and authenticate 
 - Cache with ``Redis``;
 
 ### Status
+- API Gateway
+  - [ ] Security
 - Product
-  - work in progress
+  - [x] Controller
+  - [x] ExceptionHandler
+  - [x] Service
+  - [x] Repository
+  - [ ] Validation
