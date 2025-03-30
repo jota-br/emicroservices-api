@@ -24,7 +24,7 @@ public class Inventory {
     private String name;
 
     @OneToMany(mappedBy = "inventory", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Location> location;
+    private List<Location> locations;
 
     @Version
     private int version;

@@ -4,6 +4,7 @@ import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import ostro.veda.inventory_ms.dto.AddLocationDto;
+import ostro.veda.inventory_ms.dto.LocationDto;
 import ostro.veda.inventory_ms.dto.UpdateLocationDto;
 import ostro.veda.inventory_ms.model.Inventory;
 import ostro.veda.inventory_ms.model.Location;
@@ -11,6 +12,8 @@ import ostro.veda.inventory_ms.repository.InventoryRepository;
 import ostro.veda.inventory_ms.repository.LocationRepository;
 
 import java.util.UUID;
+
+import static ostro.veda.inventory_ms.util.ToDto.toDto;
 
 @Service
 public class LocationServiceImpl implements LocationService {
@@ -35,6 +38,15 @@ public class LocationServiceImpl implements LocationService {
         Location location = build(addLocationDto, inventory);
 
         return locationRepository.save(location).getUuid();
+    }
+
+    @Override
+    public LocationDto getByUuid(String uuid) {
+        Location location = locationRepository.findByUuid(uuid)
+                .orElseThrow(() -> new EntityNotFoundException("Location with uuid %s not found"
+                        .formatted(uuid)));
+
+        return toDto(location);
     }
 
     @Override

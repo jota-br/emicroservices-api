@@ -5,6 +5,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ostro.veda.inventory_ms.dto.AddItemDto;
+import ostro.veda.inventory_ms.dto.ItemDto;
 import ostro.veda.inventory_ms.dto.UpdateProductNameDto;
 import ostro.veda.inventory_ms.dto.UpdateProductStockDto;
 import ostro.veda.inventory_ms.model.Item;
@@ -13,6 +14,8 @@ import ostro.veda.inventory_ms.repository.ItemRepository;
 import ostro.veda.inventory_ms.repository.LocationRepository;
 
 import java.util.UUID;
+
+import static ostro.veda.inventory_ms.util.ToDto.toDto;
 
 @Service
 public class ItemServiceImpl implements ItemService {
@@ -40,6 +43,15 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    public ItemDto getByUuid(String uuid) {
+        Item item = itemRepository.findByUuid(uuid)
+                .orElseThrow(() -> new EntityNotFoundException("Item with uuid %s not found"
+                        .formatted(uuid)));
+
+        return toDto(item);
+    }
+
+    @Override
     public void updateStock(final UpdateProductStockDto updateProductStockDto) {
         Item item = itemRepository
                 .findByLocationUuidAndProductUuid(
@@ -62,6 +74,19 @@ public class ItemServiceImpl implements ItemService {
                         .formatted(updateProductNameDto.getProductUuid(), updateProductNameDto.getLocationUuid())));
 
         item.setProductName(updateProductNameDto.getProductName());
+        itemRepository.save(item);
+    }
+
+    @Override
+    public void updateReserve(UpdateProductStockDto updateProductStockDto) {
+        Item item = itemRepository
+                .findByLocationUuidAndProductUuid(
+                        updateProductStockDto.getLocationUuid(), updateProductStockDto.getProductUuid()
+                )
+                .orElseThrow(() -> new EntityNotFoundException("Product with uuid %s in Location with uuid %s not found"
+                        .formatted(updateProductStockDto.getProductUuid(), updateProductStockDto.getLocationUuid())));
+
+        item.setStock(item.getReserved() + updateProductStockDto.getQuantity());
         itemRepository.save(item);
     }
 

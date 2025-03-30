@@ -12,5 +12,7 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     @Query("Select i From tb_item i JOIN tb_location l ON i.productUuid = :productUuid And l.uuid = :locationUuid")
     Optional<Item> findByLocationUuidAndProductUuid(@Param("locationUuid") String locationUuid, @Param("productUuid") String productUuid);
 
+    Optional<Item> findByUuid(String uuid);
+
     boolean existsByUuid(String uuid);
 }

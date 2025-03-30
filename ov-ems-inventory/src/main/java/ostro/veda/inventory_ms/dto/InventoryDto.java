@@ -15,6 +15,6 @@ public class InventoryDto {
 
     private final String uuid;
     private final String name;
-    private final List<LocationDto> location;
+    private final List<LocationDto> locations;
 }
 

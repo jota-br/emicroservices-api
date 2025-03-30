@@ -2,18 +2,18 @@ package ostro.veda.inventory_ms.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ostro.veda.inventory_ms.dto.AddInventoryDto;
 import ostro.veda.inventory_ms.dto.InventoryDto;
+import ostro.veda.inventory_ms.response.ResponseBody;
 import ostro.veda.inventory_ms.response.ResponsePayload;
 import ostro.veda.inventory_ms.service.InventoryService;
 
 import java.net.URI;
+import java.util.List;
 
 import static ostro.veda.inventory_ms.controller.ControllerDefaults.MAPPING_PREFIX;
 import static ostro.veda.inventory_ms.controller.ControllerDefaults.MAPPING_VERSION_SUFFIX;
@@ -39,5 +39,14 @@ public class InventoryController {
                 .toUri();
         return ResponseEntity.created(location).body(new ResponsePayload<InventoryDto>()
                 .setMessage("Inventory inserted with uuid %s".formatted(uuid)));
+    }
+
+    @GetMapping("/{uuid}")
+    public ResponseEntity<ResponsePayload<InventoryDto>> getByUuid(@RequestBody final String uuid) {
+        InventoryDto inventoryDto = inventoryService.getByUuid(uuid);
+        return ResponseEntity.status(HttpStatus.FOUND).body(new ResponsePayload<InventoryDto>()
+                .setMessage("Inventory with uuid %s found".formatted(uuid))
+                .setBody(new ResponseBody<InventoryDto>()
+                        .setData(List.of(inventoryDto))));
     }
 }
