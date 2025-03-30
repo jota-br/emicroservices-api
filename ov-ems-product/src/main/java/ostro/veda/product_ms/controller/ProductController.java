@@ -1,5 +1,6 @@
 package ostro.veda.product_ms.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import static ostro.veda.product_ms.controller.ControllerDefaults.MAPPING_VERSIO
 
 @RequestMapping(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/product")
 @RestController
+@Tag(name = "Product Controller", description = "Manage Product operations")
 public class ProductController {
 
     private final ProductService productService;
@@ -32,15 +34,14 @@ public class ProductController {
     public ResponseEntity<ResponsePayload<ProductDto>> add(@RequestBody final ProductDto productDto) {
         String uuid = productService.add(productDto);
         URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/uuid/{uuid}")
+                .fromPath(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/product/uuid/{uuid}")
                 .buildAndExpand(uuid)
                 .toUri();
         return ResponseEntity.created(location).body(new ResponsePayload<ProductDto>()
                 .setMessage("Product inserted with uuid %s".formatted(uuid)));
     }
 
-    @GetMapping("/{name}")
+    @GetMapping("/name/{name}")
     public ResponseEntity<ResponsePayload<ProductDto>> getByName(@PathVariable("name") final String name) {
         ProductDto productDto = productService.getByName(name);
         return ResponseEntity.ok(new ResponsePayload<ProductDto>()

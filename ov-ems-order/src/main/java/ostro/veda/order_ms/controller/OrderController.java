@@ -1,5 +1,6 @@
 package ostro.veda.order_ms.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import static ostro.veda.order_ms.controller.ControllerDefaults.MAPPING_VERSION_
 
 @RequestMapping(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/order")
 @RestController
+@Tag(name = "Order Controller", description = "Manage Order operations")
 public class OrderController {
 
     private final OrderService orderService;
@@ -34,15 +36,14 @@ public class OrderController {
     public ResponseEntity<ResponsePayload<OrderDto>> add(@RequestBody final OrderCreationDto orderCreationDto) {
         String uuid = orderService.add(orderCreationDto);
         URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{uuid}")
+                .fromPath(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/order/uuid/{uuid}")
                 .buildAndExpand(uuid)
                 .toUri();
         return ResponseEntity.created(location).body(new ResponsePayload<OrderDto>()
                 .setMessage("Order inserted with uuid %s".formatted(uuid)));
     }
 
-    @GetMapping("/{uuid}")
+    @GetMapping("/uuid/{uuid}")
     public ResponseEntity<ResponsePayload<OrderDto>> getByOrderUuid(@PathVariable("uuid") final String uuid) {
         OrderDto orderDto = orderService.getByOrderUuid(uuid);
         return ResponseEntity.ok(new ResponsePayload<OrderDto>()

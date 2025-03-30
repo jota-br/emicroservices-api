@@ -13,34 +13,42 @@
 Exceptions are handled using `RestControllerAdvice`.
 
 ### Endpoints
-`PUT`</br>
-`/api/v1/product/update`</br>
-Update all `Product's` fields except price and stock.
-Returns 204 No Content (success).
-
-`PUT` </br>
-`/api/v1/product/update/price/{uuid}`</br>
-Updates `Product` price.
-Returns 204 No Content (success).
-
-`POST` </br>
-`/api/v1/product/add`</br>
-Add new `Product`.
-
-`GET` </br>
-`/api/v1/product/{name}`</br>
-Get `Product` with `{name}`.
-
-`GET` </br>
-`/api/v1/product/uuid/{uuid}`</br>
-Get `Product` with `{uuid}`.
-
-`GET` </br>
-`/api/v1/product/category/{category}`</br>
-Get `Products` with `{category}`.
+![img.png](docs/img.png)
 
 All endpoints return an `ResponsePayload` with a message indicating the operation success or failure and a `ResponseBody` if retrieving data.
 
 ### In progress
 - Validation will be done with annotations;
 - Security will be handled by Spring Cloud Gateway;
+
+### Diagram
+```mermaid
+classDiagram
+    class Product {
+        +String id
+        +String uuid
+        +String name
+        +String description
+        +BigDecimal price
+        +boolean isActive
+        +int version
+        +LocalDateTime createdAt
+        +LocalDateTime updatedAt
+        +List<Category> categories
+        +List<Image> images
+    }
+
+    class Image {
+        +String imagePath
+        +boolean isMain
+    }
+
+    class Category {
+        +String name
+        +String description
+        +boolean isActive
+    }
+
+    Product "1" --> "many" Image : contains
+    Product "1" --> "many" Category : belongs to
+```
