@@ -2,7 +2,6 @@ package ostro.veda.product_ms.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -76,8 +75,7 @@ public class ProductController {
     public ResponseEntity<ResponsePayload<ProductDto>> update(@RequestBody final ProductDto productDto) {
         productService.update(productDto);
         return ResponseEntity
-                .status(HttpStatus.NO_CONTENT)
-                .body(
+                .ok(
                         new ResponsePayload<ProductDto>()
                                 .setMessage("Product updated")
                 );
@@ -89,8 +87,7 @@ public class ProductController {
     ) {
         productService.updatePrice(productPriceDto);
         return ResponseEntity
-                .status(HttpStatus.NO_CONTENT)
-                .body(
+                .ok(
                         new ResponsePayload<ProductDto>()
                                 .setMessage("Product stock and price updated")
                 );

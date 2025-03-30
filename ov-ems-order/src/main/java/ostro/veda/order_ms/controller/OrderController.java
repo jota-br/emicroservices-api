@@ -2,7 +2,6 @@ package ostro.veda.order_ms.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -64,21 +63,21 @@ public class OrderController {
     @PutMapping("/update")
     public ResponseEntity<ResponsePayload<OrderDto>> update(@RequestBody final OrderStatusUpdateDto orderStatusUpdateDto) {
         orderService.updateOrderStatus(orderStatusUpdateDto);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new ResponsePayload<OrderDto>()
+        return ResponseEntity.ok(new ResponsePayload<OrderDto>()
                 .setMessage("Order Status updated to %s".formatted(orderStatusUpdateDto.getStatus())));
     }
 
     @PostMapping("/cancel/{uuid}")
     public ResponseEntity<ResponsePayload<OrderDto>> cancel(@PathVariable("uuid") final String uuid) {
         orderService.cancelOrder(uuid);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new ResponsePayload<OrderDto>()
+        return ResponseEntity.ok(new ResponsePayload<OrderDto>()
                 .setMessage("Order with uuid %s has been CANCELLED".formatted(uuid)));
     }
 
     @PostMapping("/return")
     public ResponseEntity<ResponsePayload<OrderDto>> returnItem(@RequestBody final OrderReturnItemDto orderReturnItemDto) {
         orderService.returnItem(orderReturnItemDto);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new ResponsePayload<OrderDto>()
+        return ResponseEntity.ok(new ResponsePayload<OrderDto>()
                 .setMessage("Product with uuid %s return requested".formatted(orderReturnItemDto.getProductUuid())));
     }
 }
