@@ -1,13 +1,11 @@
 package ostro.veda.inventory_ms.service;
 
+import jakarta.persistence.EntityExistsException;
 import org.springframework.stereotype.Service;
-import ostro.veda.inventory_ms.dto.InventoryDto;
+import ostro.veda.inventory_ms.dto.AddInventoryDto;
 import ostro.veda.inventory_ms.model.Inventory;
-import ostro.veda.inventory_ms.model.Item;
-import ostro.veda.inventory_ms.model.Location;
 import ostro.veda.inventory_ms.repository.InventoryRepository;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -20,41 +18,19 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public String addInventory(InventoryDto inventoryDto) {
-        Inventory inventory = build(inventoryDto);
+    public String addInventory(final AddInventoryDto addInventoryDto) {
+        boolean exists = inventoryRepository.existsByName(addInventoryDto.getName());
+        if (exists) throw new EntityExistsException("Inventory with name %s already exists".formatted(addInventoryDto.getName()));
+
+        Inventory inventory = build(addInventoryDto);
         return inventoryRepository.save(inventory).getUuid();
     }
 
-    private Inventory build(InventoryDto inventoryDto) {
-        Inventory inventory = Inventory
+    private Inventory build(final AddInventoryDto addInventoryDto) {
+        return Inventory
                 .builder()
                 .uuid(UUID.randomUUID().toString())
+                .name(addInventoryDto.getName())
                 .build();
-
-        List<Location> locations = inventoryDto.getLocation()
-                .stream()
-                .map(locationDto -> Location
-                        .builder()
-                        .name(locationDto.getName())
-                        .uuid(UUID.randomUUID().toString())
-                        .inventory(inventory)
-                        .items(locationDto.getItems()
-                                .stream()
-                                .map(item -> Item
-                                        .builder()
-                                        .uuid(UUID.randomUUID().toString())
-                                        .productUuid(item.getProductUuid())
-                                        .productName(item.getProductName())
-                                        .stock(item.getStock())
-                                        .reserved(item.getReserved())
-                                        .build())
-                                .toList())
-                        .build())
-                .toList();
-
-        locations.forEach(location -> location.getItems().forEach(item -> item.setLocation(location)));
-        inventory.setLocation(locations);
-
-        return inventory;
     }
 }

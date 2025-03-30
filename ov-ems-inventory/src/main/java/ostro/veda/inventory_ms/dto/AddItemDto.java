@@ -9,9 +9,12 @@ import lombok.experimental.Accessors;
 @Getter
 @Builder
 @AllArgsConstructor
-public class UpdateProductStockDto {
+public class AddItemDto {
 
-    private final String locationUuid;
+    private final String uuid;
     private final String productUuid;
-    private final int quantity;
+    private final String productName;
+    private final int stock;
+    private final int reserved;
+    private final String locationUuid;
 }

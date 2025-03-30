@@ -15,6 +15,6 @@ public class LocationDto {
 
     private final String uuid;
     private final String name;
-    private final long orderId;
+    private final long inventoryId;
     private final List<ItemDto> items;
 }

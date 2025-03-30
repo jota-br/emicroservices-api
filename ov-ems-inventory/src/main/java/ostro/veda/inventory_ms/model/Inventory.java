@@ -21,6 +21,7 @@ public class Inventory {
 
     @Column(nullable = false, length = 40)
     private String uuid;
+    private String name;
 
     @OneToMany(mappedBy = "inventory", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Location> location;
