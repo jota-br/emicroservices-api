@@ -6,6 +6,7 @@
     <file url="file://$PROJECT_DIR$/ov-ems-inventory/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ov-ems-order/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ov-ems-product/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ov-ems-user/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ov-ems.order/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ov.order-ms/src/main/java" charset="UTF-8" />
   </component>
