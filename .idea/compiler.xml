@@ -12,6 +12,7 @@
         </processorPath>
         <module name="ov.order-ms" />
         <module name="user" />
+        <module name="ov.user-ms" />
       </profile>
       <profile name="Annotation profile for ov.gateway-ms" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -22,8 +23,8 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
         </processorPath>
         <module name="ov.product-ms" />
-        <module name="gateway" />
         <module name="ov.inventory-ms" />
+        <module name="gateway" />
       </profile>
     </annotationProcessing>
   </component>
@@ -33,6 +34,7 @@
       <module name="ov.inventory-ms" options="-parameters" />
       <module name="ov.order-ms" options="-parameters" />
       <module name="ov.product-ms" options="-parameters" />
+      <module name="ov.user-ms" options="-parameters" />
       <module name="user" options="-parameters" />
     </option>
   </component>
