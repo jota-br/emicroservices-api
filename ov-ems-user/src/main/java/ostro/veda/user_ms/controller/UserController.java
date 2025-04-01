@@ -11,6 +11,7 @@ import ostro.veda.user_ms.response.ResponsePayload;
 import ostro.veda.user_ms.service.UserService;
 
 import java.net.URI;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
@@ -72,5 +73,14 @@ public class UserController {
                 .setMessage("User with uuid %s found".formatted(uuid))
                 .setBody(new ResponseBody<UserDto>()
                         .setData(List.of(userDto))));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<ResponsePayload<UserSessionDto>> login(@RequestBody final LoginDto loginDto) throws NoSuchAlgorithmException, InvalidKeyException {
+        UserSessionDto userSessionDto = userService.login(loginDto);
+        return ResponseEntity.ok(new ResponsePayload<UserSessionDto>()
+                .setMessage("User with username %s found".formatted(loginDto.getUsername()))
+                .setBody(new ResponseBody<UserSessionDto>()
+                        .setData(List.of(userSessionDto))));
     }
 }

@@ -40,7 +40,7 @@ public class Address {
     @Column(nullable = false)
     private AddressType type;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "city_id", nullable = false)
     private City city;
 
