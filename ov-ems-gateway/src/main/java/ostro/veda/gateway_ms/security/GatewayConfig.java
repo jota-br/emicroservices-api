@@ -9,27 +9,24 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.web.reactive.config.ResourceHandlerRegistry;
+import org.springframework.web.reactive.config.WebFluxConfigurer;
 
 import javax.crypto.spec.SecretKeySpec;
 
 @Configuration
 @EnableWebFluxSecurity
-public class GatewayConfig {
+public class GatewayConfig implements WebFluxConfigurer {
 
     @Bean
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
-                .route("inventory-service", r -> r.path("/api/v1/inventory/**")
-                        .filters(f -> f.addRequestHeader("X-Forwarded-By", "Gateway"))
-                        .uri("http://localhost:8083"))
-                .route("product-service", r -> r.path("/api/v1/product/**")
-                        .filters(f -> f.addRequestHeader("X-Forwarded-By", "Gateway"))
-                        .uri("http://localhost:8081"))
-                .route("order-service", r -> r.path("/api/v1/order/**")
-                        .filters(f -> f.addRequestHeader("X-Forwarded-By", "Gateway"))
-                        .uri("http://localhost:8082"))
-                .route("user-service", r -> r.path("/user/login")
-                        .uri("http://localhost:8084/api/v1/user/login"))
+                .route("user-service", r -> r.path("/user/**")
+                        .filters(f -> f.filter((exchange, chain) -> {
+                            System.out.println("Request path: " + exchange.getRequest().getPath());
+                            return chain.filter(exchange);
+                        }))
+                        .uri("http://localhost:8084/api/v1/user/"))
                 .build();
     }
 
@@ -52,5 +49,10 @@ public class GatewayConfig {
         byte[] keyBytes = System.getenv("SECRET_KEY").getBytes(); // Use a secure key in practice!
         javax.crypto.SecretKey secretKey = new SecretKeySpec(keyBytes, "HmacSHA256");
         return NimbusReactiveJwtDecoder.withSecretKey(secretKey).build();
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/**").addResourceLocations("classpath:/nonexistent/");
     }
 }
