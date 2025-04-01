@@ -22,11 +22,8 @@ public class GatewayConfig implements WebFluxConfigurer {
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
                 .route("user-service", r -> r.path("/user/**")
-                        .filters(f -> f.filter((exchange, chain) -> {
-                            System.out.println("Request path: " + exchange.getRequest().getPath());
-                            return chain.filter(exchange);
-                        }))
-                        .uri("http://localhost:8084/api/v1/user/"))
+                        .filters(f -> f.rewritePath("/user/(?<segment>.*)", "/api/v1/user/${segment}"))
+                        .uri("http://localhost:8084"))
                 .build();
     }
 
