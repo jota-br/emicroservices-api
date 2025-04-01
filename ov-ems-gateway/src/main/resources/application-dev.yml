@@ -14,5 +14,5 @@ spring:
           uri: http://localhost:8082
           predicates:
             - Path=/api/v1/order/**
-server:
-  port: 8080
+  server:
+    port: 8080
