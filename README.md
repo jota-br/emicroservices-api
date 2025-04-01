@@ -33,3 +33,11 @@ RESTful API for adding and retrieving products, placing orders and authenticate 
     - [x] Service
     - [x] Repository
     - [ ] Validation
+- User
+    - [x] Controller
+    - [x] ExceptionHandler
+    - [x] Service
+    - [x] Repository
+    - [ ] JWT
+    - [ ] Login
+    - [ ] Validation
