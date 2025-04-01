@@ -17,6 +17,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
 
+import static ostro.veda.user_ms.controller.ControllerDefaults.MAPPING_PREFIX;
+import static ostro.veda.user_ms.controller.ControllerDefaults.MAPPING_VERSION_SUFFIX;
+
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig {
@@ -38,8 +41,13 @@ public class WebSecurityConfig {
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/user/login").permitAll()
-                        .requestMatchers("/api/v1/**").permitAll()
+                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/user/login").permitAll()
+                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/user/add").permitAll()
+                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/user/add/address").hasAnyRole("USERS", "ADMINS")
+                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/user/update").hasAnyRole("USERS", "ADMINS")
+                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/user/update/password").hasAnyRole("USERS", "ADMINS")
+                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/user").hasAnyRole("USERS", "ADMINS")
+                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/address").hasAnyRole("USERS", "ADMINS")
                         .requestMatchers(SWAGGER_WHITELIST).permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
                         .anyRequest().permitAll()

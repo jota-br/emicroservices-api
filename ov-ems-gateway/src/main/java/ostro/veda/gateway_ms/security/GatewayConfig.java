@@ -43,7 +43,7 @@ public class GatewayConfig implements WebFluxConfigurer {
 
     @Bean
     public ReactiveJwtDecoder jwtDecoder() {
-        byte[] keyBytes = System.getenv("SECRET_KEY").getBytes(); // Use a secure key in practice!
+        byte[] keyBytes = System.getenv("SECRET_KEY").getBytes();
         javax.crypto.SecretKey secretKey = new SecretKeySpec(keyBytes, "HmacSHA256");
         return NimbusReactiveJwtDecoder.withSecretKey(secretKey).build();
     }
