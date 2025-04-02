@@ -2,6 +2,7 @@ package ostro.veda.user_ms.service;
 
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.security.auth.message.AuthException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ostro.veda.user_ms.dto.*;
@@ -10,8 +11,8 @@ import ostro.veda.user_ms.repository.*;
 import ostro.veda.user_ms.security.JWTCreator;
 import ostro.veda.user_ms.security.JWTObject;
 import ostro.veda.user_ms.security.SecurityConfig;
+import ostro.veda.user_ms.util.AuthenticationHeader;
 
-import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -49,6 +50,9 @@ public class UserServiceImpl implements UserService {
         exists = userRepository.existsByEmail(addUserDto.getEmail());
         if (exists) throw new EntityExistsException("Email %s already in use".formatted(addUserDto.getEmail()));
 
+        exists = userRepository.existsByPhone(addUserDto.getPhone());
+        if (exists) throw new EntityExistsException("Phone %s already in use".formatted(addUserDto.getPhone()));
+
         User user = build(addUserDto);
 
         return userRepository.save(user).getUuid();
@@ -58,6 +62,8 @@ public class UserServiceImpl implements UserService {
     public void update(final UpdateUserDto updateUserDto) {
         User user = userRepository.findByUuid(updateUserDto.getUuid())
                 .orElseThrow(() -> new EntityNotFoundException("User with uuid %s not found".formatted(updateUserDto.getUuid())));
+
+        AuthenticationHeader.check(user.getUsername());
 
         updateUser(user, updateUserDto);
 
@@ -69,6 +75,8 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUuid(updateUserPasswordDto.getUuid())
                 .orElseThrow(() -> new EntityNotFoundException("User with uuid %s not found".formatted(updateUserPasswordDto.getUuid())));
 
+        AuthenticationHeader.check(user.getUsername());
+
         updatePassword(user, updateUserPasswordDto);
 
         userRepository.save(user);
@@ -78,6 +86,8 @@ public class UserServiceImpl implements UserService {
     public String addAddress(AddUserAddressDto addUserAddressDto) {
         User user = userRepository.findByUuid(addUserAddressDto.getUuid())
                 .orElseThrow(() -> new EntityNotFoundException("User with uuid %s not found".formatted(addUserAddressDto.getUuid())));
+
+        AuthenticationHeader.check(user.getUsername());
 
         user.getAddress().forEach(address -> address.setActive(false));
         addAddress(user, addUserAddressDto);
@@ -89,17 +99,19 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUuid(uuid)
                 .orElseThrow(() -> new EntityNotFoundException("User with uuid %s not found".formatted(uuid)));
 
+        AuthenticationHeader.check(user.getUsername());
+
         return toDto(user);
     }
 
     @Override
-    public UserSessionDto login(LoginDto loginDto) throws InvalidKeyException, NoSuchAlgorithmException {
+    public UserSessionDto login(LoginDto loginDto) throws AuthException, NoSuchAlgorithmException {
         User user = userRepository.findByUsername(loginDto.getUsername())
                 .orElseThrow(() -> new EntityNotFoundException("User with username %s not found"
                         .formatted(loginDto.getUsername())));
 
         if (!getHash(loginDto.getPassword(), user.getSalt()).equals(user.getHash()))
-            throw new InvalidKeyException("Password doesn't match");
+            throw new AuthException("Password doesn't match");
 
         JWTObject jwtObject = new JWTObject();
         jwtObject.setSubject(user.getUsername());

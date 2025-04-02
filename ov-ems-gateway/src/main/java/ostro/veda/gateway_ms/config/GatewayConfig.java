@@ -1,4 +1,4 @@
-package ostro.veda.gateway_ms.security;
+package ostro.veda.gateway_ms.config;
 
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
