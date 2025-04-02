@@ -1,8 +1,8 @@
-package io.github.jotabrc.service;
+package ostro.veda.user_ms.service;
 
-import io.github.jotabrc.dto.*;
+import jakarta.security.auth.message.AuthException;
+import ostro.veda.user_ms.dto.*;
 
-import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
 public interface UserService {
@@ -17,5 +17,5 @@ public interface UserService {
 
     UserDto getUserByUuid(String uuid);
 
-    UserSessionDto login(LoginDto loginDto) throws InvalidKeyException, NoSuchAlgorithmException;
+    UserSessionDto login(LoginDto loginDto) throws AuthException, NoSuchAlgorithmException;
 }

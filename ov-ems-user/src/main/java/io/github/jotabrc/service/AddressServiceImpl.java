@@ -1,13 +1,14 @@
-package io.github.jotabrc.service;
+package ostro.veda.user_ms.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import io.github.jotabrc.dto.AddressDto;
-import io.github.jotabrc.model.Address;
-import io.github.jotabrc.repository.AddressRepository;
+import ostro.veda.user_ms.dto.AddressDto;
+import ostro.veda.user_ms.model.Address;
+import ostro.veda.user_ms.repository.AddressRepository;
+import ostro.veda.user_ms.util.AuthenticationHeader;
 
-import static io.github.jotabrc.util.ToDto.toDto;
+import static ostro.veda.user_ms.util.ToDto.toDto;
 
 @Service
 public class AddressServiceImpl implements AddressService {
@@ -23,6 +24,8 @@ public class AddressServiceImpl implements AddressService {
     public AddressDto getAddressByUuid(String uuid) {
         Address address = addressRepository.findByUuid(uuid)
                 .orElseThrow(() -> new EntityNotFoundException("Address with uuid %s not found".formatted(uuid)));
+
+        AuthenticationHeader.check(address.getUser().getUsername());
 
         return toDto(address);
     }

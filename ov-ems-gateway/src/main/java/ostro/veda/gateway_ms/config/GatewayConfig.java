@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:ov-ems-gateway/src/main/java/io/github/jotabrc/security/GatewayConfig.java
 package io.github.jotabrc.security;
+========
+package ostro.veda.gateway_ms.config;
+>>>>>>>> 84ae74d245e4b03a79990b4eee0fcc1aea84e1c8:ov-ems-gateway/src/main/java/ostro/veda/gateway_ms/config/GatewayConfig.java
 
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
