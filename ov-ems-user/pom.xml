@@ -8,10 +8,10 @@
 		<version>3.4.4</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>ov-ems-user</groupId>
+	<groupId>io.github.jotabrc</groupId>
 	<artifactId>ov.user-ms</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>user</name>
+	<name>ov.user-ms</name>
 	<description>Ostro Veda User Microservice</description>
 	<url/>
 	<licenses>
