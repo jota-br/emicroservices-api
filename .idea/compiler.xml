@@ -10,9 +10,9 @@
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
         </processorPath>
+        <module name="ov.user-ms" />
         <module name="ov.order-ms" />
         <module name="user" />
-        <module name="ov.user-ms" />
       </profile>
       <profile name="Annotation profile for ov.gateway-ms" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />

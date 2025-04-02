@@ -4,9 +4,9 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
-import io.jsonwebtoken.security.Keys;
 
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.SignatureException;
 import java.util.List;
@@ -19,7 +19,7 @@ public class JWTCreator {
     public static String create(String prefix, String key, JWTObject jwtObject) {
 
         byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
-        SecretKey signingKey = Keys.hmacShaKeyFor(keyBytes);
+        SecretKey signingKey = new SecretKeySpec(keyBytes, "HmacSHA512");
 
         String token = Jwts.builder()
                 .subject(jwtObject.getSubject())
@@ -34,7 +34,7 @@ public class JWTCreator {
             throws ExpiredJwtException, UnsupportedJwtException, MalformedJwtException, SignatureException {
 
         byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
-        SecretKey signingKey = Keys.hmacShaKeyFor(keyBytes);
+        SecretKey signingKey = new SecretKeySpec(keyBytes, "HmacSHA512");
 
         JWTObject object = new JWTObject();
         token = token.replace(prefix, "");
