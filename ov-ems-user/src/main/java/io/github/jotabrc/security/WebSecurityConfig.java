@@ -1,5 +1,6 @@
 package io.github.jotabrc.security;
 
+import io.github.jotabrc.ovauth.TokenGlobalFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -41,18 +42,18 @@ public class WebSecurityConfig {
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(SWAGGER_WHITELIST).permitAll()
+                        .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/user/login").permitAll()
-                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/user/add").permitAll()
+                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/user/register").permitAll()
                         .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/user/add/address").hasAnyRole("GUESTS", "ADMINS")
                         .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/user/update").hasAnyRole("GUESTS", "ADMINS")
                         .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/user/update/password").hasAnyRole("GUESTS", "ADMINS")
                         .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/user/").hasAnyRole("GUESTS", "ADMINS")
                         .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/address").hasAnyRole("GUESTS", "ADMINS")
-                        .requestMatchers(SWAGGER_WHITELIST).permitAll()
-                        .requestMatchers("/h2-console/**").permitAll()
                         .anyRequest().permitAll()
                 )
-                .addFilterAfter(new JWTFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(new TokenGlobalFilter(), UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 );

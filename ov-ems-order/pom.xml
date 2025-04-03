@@ -8,7 +8,7 @@
 		<version>3.4.4</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>ostro.veda</groupId>
+	<groupId>io.github.jotabrc</groupId>
 	<artifactId>ov.order-ms</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>ov.order-ms</name>
@@ -74,6 +74,12 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>io.github.jotabrc</groupId>
+			<artifactId>ov-auth</artifactId>
+			<version>2.0.0</version>
 		</dependency>
 	</dependencies>
 

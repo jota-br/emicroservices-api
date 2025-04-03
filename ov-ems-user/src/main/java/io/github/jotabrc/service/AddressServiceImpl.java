@@ -1,14 +1,14 @@
-package ostro.veda.user_ms.service;
+package io.github.jotabrc.service;
 
+import io.github.jotabrc.dto.AddressDto;
+import io.github.jotabrc.model.Address;
+import io.github.jotabrc.repository.AddressRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ostro.veda.user_ms.dto.AddressDto;
-import ostro.veda.user_ms.model.Address;
-import ostro.veda.user_ms.repository.AddressRepository;
 import ostro.veda.user_ms.util.AuthenticationHeader;
 
-import static ostro.veda.user_ms.util.ToDto.toDto;
+import static io.github.jotabrc.util.ToDto.toDto;
 
 @Service
 public class AddressServiceImpl implements AddressService {

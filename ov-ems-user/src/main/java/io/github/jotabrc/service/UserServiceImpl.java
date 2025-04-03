@@ -1,16 +1,16 @@
-package ostro.veda.user_ms.service;
+package io.github.jotabrc.service;
 
+import io.github.jotabrc.dto.*;
+import io.github.jotabrc.model.*;
+import io.github.jotabrc.ovauth.TokenConfig;
+import io.github.jotabrc.ovauth.TokenCreator;
+import io.github.jotabrc.ovauth.TokenObject;
+import io.github.jotabrc.repository.*;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.security.auth.message.AuthException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ostro.veda.user_ms.dto.*;
-import ostro.veda.user_ms.model.*;
-import ostro.veda.user_ms.repository.*;
-import ostro.veda.user_ms.security.JWTCreator;
-import ostro.veda.user_ms.security.JWTObject;
-import ostro.veda.user_ms.security.SecurityConfig;
 import ostro.veda.user_ms.util.AuthenticationHeader;
 
 import java.security.MessageDigest;
@@ -21,7 +21,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import static ostro.veda.user_ms.util.ToDto.toDto;
+import static io.github.jotabrc.util.ToDto.toDto;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -113,17 +113,17 @@ public class UserServiceImpl implements UserService {
         if (!getHash(loginDto.getPassword(), user.getSalt()).equals(user.getHash()))
             throw new AuthException("Password doesn't match");
 
-        JWTObject jwtObject = new JWTObject();
+        TokenObject jwtObject = new TokenObject();
         jwtObject.setSubject(user.getUsername());
         jwtObject.setIssuedAt(new Date(System.currentTimeMillis()));
-        jwtObject.setExpiration((new Date(System.currentTimeMillis() + SecurityConfig.EXPIRATION)));
+        jwtObject.setExpiration((new Date(System.currentTimeMillis() + TokenConfig.EXPIRATION)));
         jwtObject.setRoles(List.of(user.getRole().getName()));
 
 
         return UserSessionDto
                 .builder()
                 .user(user.getUsername())
-                .token(JWTCreator.create(SecurityConfig.PREFIX, SecurityConfig.KEY, jwtObject))
+                .token(TokenCreator.create(TokenConfig.PREFIX, TokenConfig.KEY, jwtObject))
                 .build();
     }
 

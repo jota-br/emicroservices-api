@@ -1,4 +1,4 @@
-package ostro.veda.gateway_ms;
+package io.github.jotabrc;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

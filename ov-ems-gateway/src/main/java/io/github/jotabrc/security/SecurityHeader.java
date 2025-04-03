@@ -1,4 +1,4 @@
-package ostro.veda.gateway_ms.security;
+package io.github.jotabrc.security;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;

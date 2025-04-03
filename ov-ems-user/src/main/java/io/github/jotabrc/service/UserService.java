@@ -1,7 +1,7 @@
-package ostro.veda.user_ms.service;
+package io.github.jotabrc.service;
 
+import io.github.jotabrc.dto.*;
 import jakarta.security.auth.message.AuthException;
-import ostro.veda.user_ms.dto.*;
 
 import java.security.NoSuchAlgorithmException;
 

@@ -1,25 +1,22 @@
-package ostro.veda.user_ms.controller;
+package io.github.jotabrc.controller;
 
+import io.github.jotabrc.dto.*;
+import io.github.jotabrc.response.ResponseBody;
+import io.github.jotabrc.response.ResponsePayload;
+import io.github.jotabrc.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.security.auth.message.AuthException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ostro.veda.user_ms.dto.*;
-import ostro.veda.user_ms.response.ResponseBody;
-import ostro.veda.user_ms.response.ResponsePayload;
-import ostro.veda.user_ms.security.CheckEncryptedHeader;
-import ostro.veda.user_ms.service.UserService;
 
 import java.net.URI;
-import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
-import static ostro.veda.user_ms.controller.ControllerDefaults.MAPPING_PREFIX;
-import static ostro.veda.user_ms.controller.ControllerDefaults.MAPPING_VERSION_SUFFIX;
+import static io.github.jotabrc.controller.ControllerDefaults.MAPPING_PREFIX;
+import static io.github.jotabrc.controller.ControllerDefaults.MAPPING_VERSION_SUFFIX;
 
 @RequestMapping(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/user")
 @RestController
@@ -33,16 +30,10 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/add")
+    @PostMapping("/register")
     public ResponseEntity<ResponsePayload<UserDto>> add(
-
-            @RequestBody final AddUserDto addUserDto,
-            @RequestHeader("X-Secure-Data") String data,
-            @RequestHeader("X-Secure-Origin") String header
-    ) throws NoSuchAlgorithmException, InvalidKeyException {
-
-        if (!CheckEncryptedHeader.compare(data, header))
-            throw new AuthorizationDeniedException("Secure origin authentication failed");
+            @RequestBody final AddUserDto addUserDto
+    ) throws NoSuchAlgorithmException {
 
         String uuid = userService.add(addUserDto);
         URI location = ServletUriComponentsBuilder
@@ -55,10 +46,7 @@ public class UserController {
 
     @PostMapping("/add/address")
     public ResponseEntity<ResponsePayload<UserDto>> addAddress(
-
-            @RequestBody final AddUserAddressDto addUserAddressDto,
-            @RequestHeader("X-Secure-Data") String data,
-            @RequestHeader("X-Secure-Origin") String header
+            @RequestBody final AddUserAddressDto addUserAddressDto
     ) throws NoSuchAlgorithmException {
 
         String uuid = userService.addAddress(addUserAddressDto);
@@ -72,10 +60,7 @@ public class UserController {
 
     @PutMapping("/update")
     public ResponseEntity<ResponsePayload<UserDto>> update(
-
-            @RequestBody final UpdateUserDto updateUserDto,
-            @RequestHeader("X-Secure-Data") String data,
-            @RequestHeader("X-Secure-Origin") String header
+            @RequestBody final UpdateUserDto updateUserDto
     ) throws NoSuchAlgorithmException {
 
         userService.update(updateUserDto);
@@ -85,10 +70,7 @@ public class UserController {
 
     @PutMapping("/update/password")
     public ResponseEntity<ResponsePayload<UserDto>> updatePassword(
-
-            @RequestBody final UpdateUserPasswordDto updateUserPasswordDto,
-            @RequestHeader("X-Secure-Data") String data,
-            @RequestHeader("X-Secure-Origin") String header
+            @RequestBody final UpdateUserPasswordDto updateUserPasswordDto
     ) throws NoSuchAlgorithmException {
 
         userService.updatePassword(updateUserPasswordDto);
@@ -98,9 +80,7 @@ public class UserController {
 
     @GetMapping("/{uuid}")
     public ResponseEntity<ResponsePayload<UserDto>> getUserByUuid(
-            @PathVariable("uuid") final String uuid,
-            @RequestHeader("X-Secure-Data") String data,
-            @RequestHeader("X-Secure-Origin") String header
+            @PathVariable("uuid") final String uuid
     ) throws NoSuchAlgorithmException {
 
         UserDto userDto = userService.getUserByUuid(uuid);
@@ -112,9 +92,7 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<ResponsePayload<UserSessionDto>> login(
-            @RequestBody final LoginDto loginDto,
-            @RequestHeader("X-Secure-Data") String data,
-            @RequestHeader("X-Secure-Origin") String header
+            @RequestBody final LoginDto loginDto
     ) throws NoSuchAlgorithmException, AuthException {
 
         UserSessionDto userSessionDto = userService.login(loginDto);

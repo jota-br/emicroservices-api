@@ -28,8 +28,8 @@ public class GlobalFilterConfig implements GlobalFilter {
             String data = Instant.now().toString();
             modifiedRequest = exchange.getRequest().mutate()
                     .header(HttpHeaders.AUTHORIZATION, authHeader)
-                    .header("X-Secure-Data", Instant.now().toString())
-                    .header("X-Secure-Origin", ostro.veda.gateway_ms.security.SecurityHeader.getEncryptedHeader(data))
+                    .header("X-Secure-Data", data)
+                    .header("X-Secure-Origin", SecurityHeader.getEncryptedHeader(data))
                     .build();
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             throw new RuntimeException(e);

@@ -5,16 +5,18 @@ RESTful API for adding and retrieving products, placing orders and authenticate 
 ### Structure
 
 - API Gateway using ``Spring Cloud Gateway``;
-- Microservices for Product, Order placement and Authentication;
-- ``Product`` with ``MongoDB Document``;
-- ``Order`` and ``User`` with ``PostgreSQL``;
-- Security will be handled using ``Spring Security`` with ``JWT``;
+- Microservices for managing products, orders, inventory and user registration and auth;
+- ``MongoDB``: ``Product``;
+- ``PostgreSQL``: ``Order``, ``User`` and ``Inventory``;
+- ``Spring Security`` with ``JWT``;
 - Cache with ``Redis``;
+- Using shared library [`ov-auth`](https://github.com/jotabrc/ov-auth) for Spring WEB (MVC) Token Creation and Authentication.
 
 ### Status
 
 - API Gateway
     - [ ] Security
+    - [ ] Cache
 - Product
     - [x] Controller
     - [x] ExceptionHandler
@@ -38,6 +40,6 @@ RESTful API for adding and retrieving products, placing orders and authenticate 
     - [x] ExceptionHandler
     - [x] Service
     - [x] Repository
-    - [ ] JWT
-    - [ ] Login
+    - [X] JWT
+    - [X] Login
     - [ ] Validation
