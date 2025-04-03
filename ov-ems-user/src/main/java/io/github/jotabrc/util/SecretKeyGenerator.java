@@ -1,4 +1,4 @@
-package io.github.jotabrc.security;
+package io.github.jotabrc.util;
 
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;

@@ -19,6 +19,7 @@ public class OrderCreationDto {
     private final String uuid;
     private final String userUuid;
     private final String userEmail;
+    private final String username;
     private final String shippingAddress;
     private final String billingAddress;
     private final LocalDateTime orderDate;

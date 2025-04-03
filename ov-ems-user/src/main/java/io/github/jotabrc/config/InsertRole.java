@@ -1,5 +1,6 @@
 package io.github.jotabrc.config;
 
+import io.github.jotabrc.security.authorization.UserRoles;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import io.github.jotabrc.model.Role;
@@ -23,21 +24,21 @@ public class InsertRole implements CommandLineRunner {
                 Role
                         .builder()
                         .uuid(UUID.randomUUID().toString())
-                        .name("GUESTS")
+                        .name(UserRoles.GUEST.getName())
                         .description("Guest - Inactive User")
                         .isActive(true)
                         .build(),
                 Role
                         .builder()
                         .uuid(UUID.randomUUID().toString())
-                        .name("USERS")
+                        .name(UserRoles.USER.getName())
                         .description("Active User")
                         .isActive(true)
                         .build(),
                 Role
                         .builder()
                         .uuid(UUID.randomUUID().toString())
-                        .name("ADMINS")
+                        .name(UserRoles.ADMIN.getName())
                         .description("Admin")
                         .isActive(true)
                         .build()

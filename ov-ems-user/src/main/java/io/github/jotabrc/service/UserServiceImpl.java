@@ -6,12 +6,12 @@ import io.github.jotabrc.ovauth.TokenConfig;
 import io.github.jotabrc.ovauth.TokenCreator;
 import io.github.jotabrc.ovauth.TokenObject;
 import io.github.jotabrc.repository.*;
+import io.github.jotabrc.security.authorization.UserRoles;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.security.auth.message.AuthException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ostro.veda.user_ms.util.AuthenticationHeader;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -33,7 +33,8 @@ public class UserServiceImpl implements UserService {
     private final CountryRepository countryRepository;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, CityRepository cityRepository, StateRepository stateRepository, CountryRepository countryRepository) {
+    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, CityRepository cityRepository,
+                           StateRepository stateRepository, CountryRepository countryRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.cityRepository = cityRepository;
@@ -45,7 +46,6 @@ public class UserServiceImpl implements UserService {
     public String add(final AddUserDto addUserDto) throws NoSuchAlgorithmException {
         boolean exists = userRepository.existsByUsername(addUserDto.getUsername());
         if (exists) throw new EntityExistsException("Username %s already in use".formatted(addUserDto.getUsername()));
-
 
         exists = userRepository.existsByEmail(addUserDto.getEmail());
         if (exists) throw new EntityExistsException("Email %s already in use".formatted(addUserDto.getEmail()));
@@ -63,8 +63,6 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUuid(updateUserDto.getUuid())
                 .orElseThrow(() -> new EntityNotFoundException("User with uuid %s not found".formatted(updateUserDto.getUuid())));
 
-        AuthenticationHeader.check(user.getUsername());
-
         updateUser(user, updateUserDto);
 
         userRepository.save(user);
@@ -74,8 +72,6 @@ public class UserServiceImpl implements UserService {
     public void updatePassword(final UpdateUserPasswordDto updateUserPasswordDto) throws NoSuchAlgorithmException {
         User user = userRepository.findByUuid(updateUserPasswordDto.getUuid())
                 .orElseThrow(() -> new EntityNotFoundException("User with uuid %s not found".formatted(updateUserPasswordDto.getUuid())));
-
-        AuthenticationHeader.check(user.getUsername());
 
         updatePassword(user, updateUserPasswordDto);
 
@@ -87,8 +83,6 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUuid(addUserAddressDto.getUuid())
                 .orElseThrow(() -> new EntityNotFoundException("User with uuid %s not found".formatted(addUserAddressDto.getUuid())));
 
-        AuthenticationHeader.check(user.getUsername());
-
         user.getAddress().forEach(address -> address.setActive(false));
         addAddress(user, addUserAddressDto);
         return userRepository.save(user).getAddress().get(user.getAddress().size() - 1).getUuid();
@@ -98,8 +92,6 @@ public class UserServiceImpl implements UserService {
     public UserDto getUserByUuid(String uuid) {
         User user = userRepository.findByUuid(uuid)
                 .orElseThrow(() -> new EntityNotFoundException("User with uuid %s not found".formatted(uuid)));
-
-        AuthenticationHeader.check(user.getUsername());
 
         return toDto(user);
     }
@@ -132,8 +124,9 @@ public class UserServiceImpl implements UserService {
         String encodedSalt = getEncodedSalt(salt);
         String hash = getHash(addUserDto.getPassword(), salt);
 
-        Role role = roleRepository.findByName("GUESTS")
-                .orElseThrow(() -> new EntityNotFoundException("Role with name GUESTS not found"));
+        String defaultRole = UserRoles.GUEST.getName();
+        Role role = roleRepository.findByName(defaultRole)
+                .orElseThrow(() -> new EntityNotFoundException("Role with name %s not found".formatted(defaultRole)));
 
         return User
                 .builder()

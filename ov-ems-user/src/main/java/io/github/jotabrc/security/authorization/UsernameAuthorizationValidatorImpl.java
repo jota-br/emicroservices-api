@@ -1,11 +1,14 @@
-package ostro.veda.user_ms.util;
+package io.github.jotabrc.security.authorization;
 
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 
-public class AuthenticationHeader {
+@Component
+public class UsernameAuthorizationValidatorImpl implements UsernameAuthorizationValidator {
 
-    public static void check(String username) {
+    @Override
+    public void validate(String username) {
         if (!SecurityContextHolder
                 .getContext()
                 .getAuthentication()

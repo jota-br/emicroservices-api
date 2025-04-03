@@ -1,10 +1,5 @@
 package io.github.jotabrc.service;
 
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.stereotype.Service;
 import io.github.jotabrc.document.Category;
 import io.github.jotabrc.document.Image;
 import io.github.jotabrc.document.Product;
@@ -15,6 +10,11 @@ import io.github.jotabrc.dto.ProductPriceDto;
 import io.github.jotabrc.handler.DocumentAlreadyExistsException;
 import io.github.jotabrc.handler.DocumentNotFoundException;
 import io.github.jotabrc.repository.ProductRepository;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
