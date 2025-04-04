@@ -10,7 +10,9 @@ RESTful API for adding and retrieving products, placing orders and authenticate 
 - ``PostgreSQL``: ``Order``, ``User`` and ``Inventory``;
 - ``Spring Security`` with ``JWT``;
 - Cache with ``Redis``;
-- Using shared library [`ov-auth`](https://github.com/jotabrc/ov-auth) for Spring WEB (MVC) Token Creation and Authentication.
+- Using shared libraries:
+  - [`ov-auth`](https://github.com/jotabrc/ov-auth) for Spring WEB (MVC) Token Creation and Authentication.
+  - [`ov-annotation-validator`](https://github.com/jotabrc/ov-annotation-validator) for user input validation.
 
 ### Status
 

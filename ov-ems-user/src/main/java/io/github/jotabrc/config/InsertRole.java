@@ -1,6 +1,6 @@
 package io.github.jotabrc.config;
 
-import io.github.jotabrc.security.authorization.UserRoles;
+import io.github.jotabrc.util.UserRoles;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import io.github.jotabrc.model.Role;

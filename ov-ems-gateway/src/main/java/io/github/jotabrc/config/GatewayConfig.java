@@ -44,7 +44,7 @@ public class GatewayConfig implements WebFluxConfigurer {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(auth -> auth
                         .pathMatchers("/user/login").permitAll()
-                        .pathMatchers("/user/add").permitAll()
+                        .pathMatchers("/user/register").permitAll()
                         .anyExchange().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2

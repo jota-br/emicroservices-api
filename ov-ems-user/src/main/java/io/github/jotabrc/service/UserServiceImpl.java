@@ -6,10 +6,11 @@ import io.github.jotabrc.ovauth.TokenConfig;
 import io.github.jotabrc.ovauth.TokenCreator;
 import io.github.jotabrc.ovauth.TokenObject;
 import io.github.jotabrc.repository.*;
-import io.github.jotabrc.security.authorization.UserRoles;
+import io.github.jotabrc.util.UserRoles;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.security.auth.message.AuthException;
+import jakarta.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +32,9 @@ public class UserServiceImpl implements UserService {
     private final CityRepository cityRepository;
     private final StateRepository stateRepository;
     private final CountryRepository countryRepository;
+
+    @Autowired
+    private Validator validator;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, CityRepository cityRepository,

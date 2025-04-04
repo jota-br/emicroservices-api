@@ -1,4 +1,4 @@
-package io.github.jotabrc.security.authorization;
+package io.github.jotabrc.util;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

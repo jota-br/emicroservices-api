@@ -21,3 +21,27 @@ spring:
       settings:
         trace: false
         web-allow-others: false
+
+exception:
+  message:
+    role: User authorization denied
+    username: User authorization denied
+
+validation:
+  text255-pattern: "^[A-Za-z\\s\\p{Punct}0-9]{1,255}$"
+  text255-message: "Input is invalid"
+
+  text50-pattern: "^[A-Za-z\\s\\p{Punct}0-9]{1,50}$"
+  text50-message: "Input is invalid"
+
+  password-pattern: "^[A-Za-z0-9!@#$%^&*()_+\\-={}\\[\\]:;\"'<>,.?/|\\\\]{8,50}$"
+  password-message: "Password is invalid"
+
+  phone-pattern: "\\+\\d{6,14}"
+  phone-message: "Phone is invalid"
+
+  username-pattern: "^[a-zA-Z0-9@_-]{8,50}$"
+  username-message: "Username is invalid"
+
+  description-pattern: "^[a-zA-Z\\s\\p{Punct}0-9\n]{0,510}$"
+  description-message: "Description is invalid"
