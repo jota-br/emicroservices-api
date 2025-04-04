@@ -42,7 +42,7 @@ public class LocationController {
                 .setMessage("Location inserted with uuid %s".formatted(uuid)));
     }
 
-    @GetMapping("/{uuid}")
+    @GetMapping("/get/uuid/{uuid}")
     public ResponseEntity<ResponsePayload<LocationDto>> getByUuid(@RequestBody final String uuid) {
         LocationDto locationDto = locationService.getByUuid(uuid);
         return ResponseEntity.status(HttpStatus.FOUND).body(new ResponsePayload<LocationDto>()

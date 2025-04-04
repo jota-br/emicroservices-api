@@ -1,10 +1,10 @@
 package io.github.jotabrc.dto;
 
+import io.github.jotabrc.model.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.Accessors;
-import io.github.jotabrc.model.OrderStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

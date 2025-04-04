@@ -7,6 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum UserRoles {
 
+    SYSTEM("SYSTEM"),
     ADMIN("ADMIN"),
     USER("USER"),
     GUEST("GUEST");

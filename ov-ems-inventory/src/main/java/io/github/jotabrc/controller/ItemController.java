@@ -40,7 +40,7 @@ public class ItemController {
                 .setMessage("Item inserted with uuid %s".formatted(uuid)));
     }
 
-    @GetMapping("/{uuid}")
+    @GetMapping("/get/uuid/{uuid}")
     public ResponseEntity<ResponsePayload<ItemDto>> getByUuid(@RequestBody final String uuid) {
         ItemDto itemDto = itemService.getByUuid(uuid);
         return ResponseEntity.status(HttpStatus.FOUND).body(new ResponsePayload<ItemDto>()

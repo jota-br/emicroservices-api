@@ -1,15 +1,15 @@
 package io.github.jotabrc.controller;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import io.github.jotabrc.dto.ProductDto;
 import io.github.jotabrc.dto.ProductPriceDto;
 import io.github.jotabrc.response.ResponseBody;
 import io.github.jotabrc.response.ResponsePayload;
 import io.github.jotabrc.service.ProductService;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
@@ -40,7 +40,7 @@ public class ProductController {
                 .setMessage("Product inserted with uuid %s".formatted(uuid)));
     }
 
-    @GetMapping("/name/{name}")
+    @GetMapping("/get/name/{name}")
     public ResponseEntity<ResponsePayload<ProductDto>> getByName(@PathVariable("name") final String name) {
         ProductDto productDto = productService.getByName(name);
         return ResponseEntity.ok(new ResponsePayload<ProductDto>()
@@ -50,7 +50,7 @@ public class ProductController {
         );
     }
 
-    @GetMapping("/category/{category}")
+    @GetMapping("/get/category/{category}")
     public ResponseEntity<ResponsePayload<ProductDto>> getByCategory(@PathVariable("category") final String category) {
         List<ProductDto> productDto = productService.getByCategories(category);
         return ResponseEntity.ok(
@@ -61,7 +61,7 @@ public class ProductController {
         );
     }
 
-    @GetMapping("/uuid/{uuid}")
+    @GetMapping("/get/uuid/{uuid}")
     public ResponseEntity<ResponsePayload<ProductDto>> getByUuid(@PathVariable("uuid") final String uuid) {
         ProductDto productDto = productService.getByUuid(uuid);
         return ResponseEntity.ok(new ResponsePayload<ProductDto>()
@@ -81,7 +81,7 @@ public class ProductController {
                 );
     }
 
-    @PutMapping("/update/price/{uuid}")
+    @PutMapping("/update/price")
     public ResponseEntity<ResponsePayload<ProductDto>> updatePrice(
             @RequestBody final ProductPriceDto productPriceDto
     ) {

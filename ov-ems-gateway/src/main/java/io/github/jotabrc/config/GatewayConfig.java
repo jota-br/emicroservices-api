@@ -1,5 +1,6 @@
 package io.github.jotabrc.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
@@ -27,14 +28,36 @@ import java.util.stream.Collectors;
 @EnableWebFluxSecurity
 public class GatewayConfig implements WebFluxConfigurer {
 
+    @Autowired
+    private ServiceConfiguration serviceConfig;
+
     @Bean
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
+        System.out.println(serviceConfig.getUserServiceReplacement());
         return builder.routes()
-                .route("user-service", r -> r.path("/user/**")
+                .route(serviceConfig.getUserServiceName(), r -> r.path("/user/**")
                         .filters(f -> f
-                                .rewritePath("/user/(?<segment>.*)", "/api/v1/user/${segment}")
+                                .rewritePath(serviceConfig.getUserServicePattern(), serviceConfig.getUserServiceReplacement())
                         )
-                        .uri("http://localhost:8084"))
+                        .uri(serviceConfig.getUserServiceUri()))
+
+                .route(serviceConfig.getInventoryServiceName(), r -> r.path("/inventory/**")
+                        .filters(f -> f
+                                .rewritePath(serviceConfig.getInventoryServicePattern(), serviceConfig.getInventoryServiceReplacement())
+                        )
+                        .uri(serviceConfig.getInventoryServiceUri()))
+
+                .route(serviceConfig.getOrderServiceName(), r -> r.path("/order/**")
+                        .filters(f -> f
+                                .rewritePath(serviceConfig.getOrderServicePattern(), serviceConfig.getOrderServiceReplacement())
+                        )
+                        .uri(serviceConfig.getOrderServiceUri()))
+
+                .route(serviceConfig.getProductServiceName(), r -> r.path("/product/**")
+                        .filters(f -> f
+                                .rewritePath(serviceConfig.getProductServicePattern(), serviceConfig.getProductServiceReplacement())
+                        )
+                        .uri(serviceConfig.getProductServiceUri()))
                 .build();
     }
 

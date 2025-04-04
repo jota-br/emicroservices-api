@@ -41,7 +41,7 @@ public class InventoryController {
                 .setMessage("Inventory inserted with uuid %s".formatted(uuid)));
     }
 
-    @GetMapping("/{uuid}")
+    @GetMapping("/get/uuid/{uuid}")
     public ResponseEntity<ResponsePayload<InventoryDto>> getByUuid(@RequestBody final String uuid) {
         InventoryDto inventoryDto = inventoryService.getByUuid(uuid);
         return ResponseEntity.status(HttpStatus.FOUND).body(new ResponsePayload<InventoryDto>()

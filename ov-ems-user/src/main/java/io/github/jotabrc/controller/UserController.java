@@ -1,7 +1,6 @@
 package io.github.jotabrc.controller;
 
 import io.github.jotabrc.dto.*;
-import io.github.jotabrc.ov_annotation_validator.config.ValidationConfig;
 import io.github.jotabrc.response.ResponseBody;
 import io.github.jotabrc.response.ResponsePayload;
 import io.github.jotabrc.service.UserService;
@@ -25,12 +24,10 @@ import static io.github.jotabrc.controller.ControllerDefaults.MAPPING_VERSION_SU
 public class UserController {
 
     private final UserService userService;
-    private final ValidationConfig validationConfig;
 
     @Autowired
-    public UserController(UserService userService, ValidationConfig validationConfig) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.validationConfig = validationConfig;
     }
 
     @PostMapping("/register")
@@ -81,7 +78,7 @@ public class UserController {
                 .setMessage("User with uuid %s password updated".formatted(updateUserPasswordDto.getUuid())));
     }
 
-    @GetMapping("/{uuid}")
+    @GetMapping("/get/uuid/{uuid}")
     public ResponseEntity<ResponsePayload<UserDto>> getUserByUuid(
             @PathVariable("uuid") final String uuid
     ) throws NoSuchAlgorithmException {

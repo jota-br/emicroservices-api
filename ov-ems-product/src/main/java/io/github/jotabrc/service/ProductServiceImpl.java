@@ -10,15 +10,18 @@ import io.github.jotabrc.dto.ProductPriceDto;
 import io.github.jotabrc.handler.DocumentAlreadyExistsException;
 import io.github.jotabrc.handler.DocumentNotFoundException;
 import io.github.jotabrc.repository.ProductRepository;
+import jakarta.validation.Valid;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.UUID;
 
+@Validated
 @Service
 public class ProductServiceImpl implements ProductService {
 
@@ -53,7 +56,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public String add(ProductDto productDto) {
+    public String add(@Valid final ProductDto productDto) {
         boolean productExists = productRepository.findByName(productDto.getName())
                 .isPresent();
 
@@ -65,7 +68,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void update(final ProductDto productDto) {
+    public void update(@Valid final ProductDto productDto) {
         boolean exists = productRepository.existsByUuid(productDto.getUuid());
 
         if (!exists) throw new DocumentNotFoundException("Product with uuid %s not found".formatted(productDto.getUuid()));
@@ -76,7 +79,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void updatePrice(ProductPriceDto productPriceDto) {
+    public void updatePrice(final ProductPriceDto productPriceDto) {
         boolean exists = productRepository.existsByUuid(productPriceDto.getUuid());
 
         if (!exists)
@@ -93,7 +96,7 @@ public class ProductServiceImpl implements ProductService {
         mongoTemplate.updateFirst(query, update, Product.class);
     }
 
-    private QueryAndUpdate getQueryAndUpdate(ProductDto productDto) {
+    private QueryAndUpdate getQueryAndUpdate(final ProductDto productDto) {
         Query query = new Query(Criteria.where("uuid").is(productDto.getUuid()));
         Update update = new Update()
                 .set("name", productDto.getName())

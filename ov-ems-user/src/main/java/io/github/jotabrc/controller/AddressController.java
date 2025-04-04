@@ -30,7 +30,7 @@ public class AddressController {
         this.addressService = addressService;
     }
 
-    @GetMapping("/{uuid}")
+    @GetMapping("/get/uuid/{uuid}")
     public ResponseEntity<ResponsePayload<AddressDto>> getUserByUuid(@PathVariable("uuid") final String uuid) throws NoSuchAlgorithmException {
         AddressDto addressDto = addressService.getAddressByUuid(uuid);
         return ResponseEntity.ok(new ResponsePayload<AddressDto>()

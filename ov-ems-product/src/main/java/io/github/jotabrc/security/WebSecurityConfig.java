@@ -35,7 +35,12 @@ public class WebSecurityConfig {
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/***").permitAll()
+                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/product/add").permitAll()
+                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/product/get/name/").permitAll()
+                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/product/get/category/").permitAll()
+                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/product/get/uuid/").permitAll()
+                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/product/update").permitAll()
+                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/product/update/price").permitAll()
                         .requestMatchers(SWAGGER_WHITELIST).permitAll()
                         .anyRequest().authenticated()
                 )

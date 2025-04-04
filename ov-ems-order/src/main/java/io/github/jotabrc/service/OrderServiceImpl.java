@@ -1,13 +1,13 @@
 package io.github.jotabrc.service;
 
-import jakarta.persistence.EntityNotFoundException;
-import org.springframework.stereotype.Service;
 import io.github.jotabrc.dto.*;
 import io.github.jotabrc.model.Order;
 import io.github.jotabrc.model.OrderDetail;
 import io.github.jotabrc.model.OrderStatus;
 import io.github.jotabrc.model.OrderStatusHistory;
 import io.github.jotabrc.repository.OrderRepository;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -31,14 +31,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderDto getByOrderUuid(String uuid) {
+    public OrderDto getByOrderUuid(final String uuid) {
         Order order = orderRepository.findByUuid(uuid)
                 .orElseThrow(() -> new EntityNotFoundException("Order with uuid %s not found".formatted(uuid)));
         return toDto(order);
     }
 
     @Override
-    public List<OrderDto> getByUserUuid(String uuid) {
+    public List<OrderDto> getByUserUuid(final String uuid) {
         List<Order> orders = orderRepository.findByUserUuid(uuid);
 
         if(orders.isEmpty()) throw  new EntityNotFoundException("No Order found with user uuid %s".formatted(uuid));
@@ -57,7 +57,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void cancelOrder(String uuid) {
+    public void cancelOrder(final String uuid) {
         Order order = orderRepository.findByUuid(uuid)
                 .orElseThrow(() -> new EntityNotFoundException("Order with uuid %s not found".formatted(uuid)));
 
@@ -67,7 +67,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void returnItem(OrderReturnItemDto orderReturnItemDto) {
+    public void returnItem(final OrderReturnItemDto orderReturnItemDto) {
         Order order = orderRepository.findByUuid(orderReturnItemDto.getOrderUuid())
                 .orElseThrow(() -> new EntityNotFoundException("Order with uuid %s not found".formatted(orderReturnItemDto.getOrderUuid())));
 

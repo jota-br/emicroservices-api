@@ -42,7 +42,7 @@ public class OrderController {
                 .setMessage("Order inserted with uuid %s".formatted(uuid)));
     }
 
-    @GetMapping("/uuid/{uuid}")
+    @GetMapping("/get/uuid/{uuid}")
     public ResponseEntity<ResponsePayload<OrderDto>> getByOrderUuid(@PathVariable("uuid") final String uuid) {
         OrderDto orderDto = orderService.getByOrderUuid(uuid);
         return ResponseEntity.ok(new ResponsePayload<OrderDto>()
@@ -51,7 +51,7 @@ public class OrderController {
                         .setData(List.of(orderDto))));
     }
 
-    @GetMapping("/user/{uuid}")
+    @GetMapping("/get/user/uuid/{uuid}")
     public ResponseEntity<ResponsePayload<OrderDto>> getByUserUuid(@PathVariable("uuid") final String uuid) {
         List<OrderDto> orderDtos = orderService.getByUserUuid(uuid);
         return ResponseEntity.ok(new ResponsePayload<OrderDto>()
@@ -67,7 +67,7 @@ public class OrderController {
                 .setMessage("Order Status updated to %s".formatted(orderStatusUpdateDto.getStatus())));
     }
 
-    @PostMapping("/cancel/{uuid}")
+    @PostMapping("/cancel/uuid/{uuid}")
     public ResponseEntity<ResponsePayload<OrderDto>> cancel(@PathVariable("uuid") final String uuid) {
         orderService.cancelOrder(uuid);
         return ResponseEntity.ok(new ResponsePayload<OrderDto>()
