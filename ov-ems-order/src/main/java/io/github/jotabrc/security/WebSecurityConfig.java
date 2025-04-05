@@ -1,5 +1,6 @@
 package io.github.jotabrc.security;
 
+import io.github.jotabrc.ov_auth_validator.util.UserRoles;
 import io.github.jotabrc.ovauth.TokenGlobalFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,14 +32,16 @@ public class WebSecurityConfig {
     protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/order/add").hasRole("SYSTEM")
-                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/order/get/uuid/").hasRole("SYSTEM")
-                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/order/get/user/uuid/").hasRole("SYSTEM")
-                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/order/update").hasRole("SYSTEM")
-                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/order/cancel/uuid/").hasRole("SYSTEM")
-                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/order/return").hasRole("SYSTEM")
                         .requestMatchers(SWAGGER_WHITELIST).permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
+                        .requestMatchers(
+                                MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/order/add",
+                                MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/order/get/uuid/",
+                                MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/order/get/user/uuid/",
+                                MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/order/update",
+                                MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/order/cancel/uuid/",
+                                MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/order/return"
+                        ).hasAnyRole(UserRoles.SYSTEM.getName(), UserRoles.ADMIN.getName(), UserRoles.USER.getName())
                         .anyRequest().authenticated()
                 )
                 .addFilterAfter(new TokenGlobalFilter(), UsernamePasswordAuthenticationFilter.class)

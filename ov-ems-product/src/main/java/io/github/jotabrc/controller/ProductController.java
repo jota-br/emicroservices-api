@@ -1,5 +1,6 @@
 package io.github.jotabrc.controller;
 
+import io.github.jotabrc.dto.AddProductDto;
 import io.github.jotabrc.dto.ProductDto;
 import io.github.jotabrc.dto.ProductPriceDto;
 import io.github.jotabrc.response.ResponseBody;
@@ -30,8 +31,8 @@ public class ProductController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ResponsePayload<ProductDto>> add(@RequestBody final ProductDto productDto) {
-        String uuid = productService.add(productDto);
+    public ResponseEntity<ResponsePayload<ProductDto>> add(@RequestBody final AddProductDto addProductDto) {
+        String uuid = productService.add(addProductDto);
         URI location = ServletUriComponentsBuilder
                 .fromPath(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/product/uuid/{uuid}")
                 .buildAndExpand(uuid)

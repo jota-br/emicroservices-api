@@ -32,7 +32,7 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
-    public InventoryDto getByUuid(String uuid) {
+    public InventoryDto getByUuid(final String uuid) {
         Inventory inventory = inventoryRepository.findByUuid(uuid)
                 .orElseThrow(() -> new EntityNotFoundException("Inventory with uuid %s not found".formatted(uuid)));
 

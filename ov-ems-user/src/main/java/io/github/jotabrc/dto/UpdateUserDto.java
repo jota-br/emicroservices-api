@@ -13,6 +13,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 public class UpdateUserDto {
 
+    @ValidateField(fieldName = "uuid", message = "Invalid UUID")
     private final String uuid;
 
     @ValidateField(fieldName = "username", message = "Invalid Username")
@@ -21,10 +22,10 @@ public class UpdateUserDto {
     @ValidateEmail(message = "Invalid Email")
     private final String email;
 
-    @ValidateField(fieldName = "text255", message = "Invalid First Name")
+    @ValidateField(fieldName = "name", message = "Invalid First Name")
     private final String firstName;
 
-    @ValidateField(fieldName = "text255", message = "Invalid Last Name")
+    @ValidateField(fieldName = "name", message = "Invalid Last Name")
     private final String lastName;
 
     @ValidateField(fieldName = "text255", message = "Invalid Phone")

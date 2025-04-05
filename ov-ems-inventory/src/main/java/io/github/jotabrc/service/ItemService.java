@@ -4,16 +4,20 @@ import io.github.jotabrc.dto.AddItemDto;
 import io.github.jotabrc.dto.ItemDto;
 import io.github.jotabrc.dto.UpdateProductNameDto;
 import io.github.jotabrc.dto.UpdateProductStockDto;
+import io.github.jotabrc.ov_annotation_validator.annotation.ValidateField;
+import jakarta.validation.Valid;
+import org.springframework.validation.annotation.Validated;
 
+@Validated
 public interface ItemService {
 
-    String add(AddItemDto addItemDto);
+    String add(@Valid AddItemDto addItemDto);
 
-    ItemDto getByUuid(String uuid);
+    ItemDto getByUuid(@Valid @ValidateField(fieldName = "uuid", message = "Invalid UUID") String uuid);
 
-    void updateStock(UpdateProductStockDto updateProductStockDto);
+    void updateStock(@Valid UpdateProductStockDto updateProductStockDto);
 
-    void updateName(UpdateProductNameDto updateProductNameDto);
+    void updateName(@Valid UpdateProductNameDto updateProductNameDto);
 
-    void updateReserve(UpdateProductStockDto updateProductStockDto);
+    void updateReserve(@Valid UpdateProductStockDto updateProductStockDto);
 }

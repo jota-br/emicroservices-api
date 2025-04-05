@@ -67,6 +67,13 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<!-- Shared library -->
+		<dependency>
+			<groupId>io.github.jotabrc</groupId>
+			<artifactId>ov-auth-validator</artifactId>
+			<version>1.0.1</version>
+		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>

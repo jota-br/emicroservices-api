@@ -18,6 +18,7 @@ public class OrderDto {
 
     private final String uuid;
     private final String userUuid;
+    private String username;
     private final String userEmail;
     private final String shippingAddress;
     private final String billingAddress;

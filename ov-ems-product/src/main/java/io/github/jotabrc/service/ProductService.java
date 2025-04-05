@@ -1,5 +1,6 @@
 package io.github.jotabrc.service;
 
+import io.github.jotabrc.dto.AddProductDto;
 import io.github.jotabrc.dto.ProductDto;
 import io.github.jotabrc.dto.ProductPriceDto;
 import io.github.jotabrc.ov_annotation_validator.annotation.ValidateField;
@@ -11,15 +12,15 @@ import java.util.List;
 @Validated
 public interface ProductService {
 
-    ProductDto getByName(@ValidateField(fieldName = "text255", message = "Invalid Name") String name);
+    ProductDto getByName(@Valid @ValidateField(fieldName = "name", message = "Invalid Name") String name);
 
-    List<ProductDto> getByCategories(@ValidateField(fieldName = "text255", message = "Invalid Category Name") String category);
+    List<ProductDto> getByCategories(@Valid @ValidateField(fieldName = "name", message = "Invalid Category Name") String category);
 
-    ProductDto getByUuid(String uuid);
+    ProductDto getByUuid(@Valid @ValidateField(fieldName = "uuid", message = "Invalid UUID") String uuid);
 
-    String add(@Valid ProductDto productDto);
+    String add(@Valid AddProductDto addProductDto);
 
     void update(@Valid ProductDto productDto);
 
-    void updatePrice(ProductPriceDto productPriceDto);
+    void updatePrice(@Valid ProductPriceDto productPriceDto);
 }

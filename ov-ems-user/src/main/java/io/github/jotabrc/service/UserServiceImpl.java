@@ -2,15 +2,15 @@ package io.github.jotabrc.service;
 
 import io.github.jotabrc.dto.*;
 import io.github.jotabrc.model.*;
+import io.github.jotabrc.ov_auth_validator.authorization.UsernameAuthorizationValidator;
+import io.github.jotabrc.ov_auth_validator.util.UserRoles;
 import io.github.jotabrc.ovauth.TokenConfig;
 import io.github.jotabrc.ovauth.TokenCreator;
 import io.github.jotabrc.ovauth.TokenObject;
 import io.github.jotabrc.repository.*;
-import io.github.jotabrc.util.UserRoles;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.security.auth.message.AuthException;
-import jakarta.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +27,7 @@ import static io.github.jotabrc.util.ToDto.toDto;
 @Service
 public class UserServiceImpl implements UserService {
 
+    private final UsernameAuthorizationValidator usernameAuthorizationValidator;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final CityRepository cityRepository;
@@ -34,11 +35,9 @@ public class UserServiceImpl implements UserService {
     private final CountryRepository countryRepository;
 
     @Autowired
-    private Validator validator;
-
-    @Autowired
-    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, CityRepository cityRepository,
+    public UserServiceImpl(UsernameAuthorizationValidator usernameAuthorizationValidator, UserRepository userRepository, RoleRepository roleRepository, CityRepository cityRepository,
                            StateRepository stateRepository, CountryRepository countryRepository) {
+        this.usernameAuthorizationValidator = usernameAuthorizationValidator;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.cityRepository = cityRepository;
@@ -67,6 +66,8 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUuid(updateUserDto.getUuid())
                 .orElseThrow(() -> new EntityNotFoundException("User with uuid %s not found".formatted(updateUserDto.getUuid())));
 
+        usernameAuthorizationValidator.validate(user.getUsername());
+
         updateUser(user, updateUserDto);
 
         userRepository.save(user);
@@ -77,15 +78,19 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUuid(updateUserPasswordDto.getUuid())
                 .orElseThrow(() -> new EntityNotFoundException("User with uuid %s not found".formatted(updateUserPasswordDto.getUuid())));
 
+        usernameAuthorizationValidator.validate(user.getUsername());
+
         updatePassword(user, updateUserPasswordDto);
 
         userRepository.save(user);
     }
 
     @Override
-    public String addAddress(AddUserAddressDto addUserAddressDto) {
+    public String addAddress(final AddUserAddressDto addUserAddressDto) {
         User user = userRepository.findByUuid(addUserAddressDto.getUuid())
                 .orElseThrow(() -> new EntityNotFoundException("User with uuid %s not found".formatted(addUserAddressDto.getUuid())));
+
+        usernameAuthorizationValidator.validate(user.getUsername());
 
         user.getAddress().forEach(address -> address.setActive(false));
         addAddress(user, addUserAddressDto);
@@ -93,15 +98,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto getUserByUuid(String uuid) {
+    public UserDto getUserByUuid(final String uuid) {
         User user = userRepository.findByUuid(uuid)
                 .orElseThrow(() -> new EntityNotFoundException("User with uuid %s not found".formatted(uuid)));
+
+        usernameAuthorizationValidator.validate(user.getUsername());
 
         return toDto(user);
     }
 
     @Override
-    public UserSessionDto login(LoginDto loginDto) throws AuthException, NoSuchAlgorithmException {
+    public UserSessionDto login(final LoginDto loginDto) throws AuthException, NoSuchAlgorithmException {
         User user = userRepository.findByUsername(loginDto.getUsername())
                 .orElseThrow(() -> new EntityNotFoundException("User with username %s not found"
                         .formatted(loginDto.getUsername())));

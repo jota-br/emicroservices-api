@@ -1,5 +1,6 @@
 package io.github.jotabrc.security;
 
+import io.github.jotabrc.ov_auth_validator.util.UserRoles;
 import io.github.jotabrc.ovauth.TokenGlobalFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,16 +38,18 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(SWAGGER_WHITELIST).permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
-                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/inventory/add").hasRole("SYSTEM")
-                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/inventory/get/uuid/").hasRole("SYSTEM")
-                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/item/add").hasRole("SYSTEM")
-                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/item/get/uuid/").hasRole("SYSTEM")
-                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/item/update/stock").hasRole("SYSTEM")
-                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/item/update/name").hasRole("SYSTEM")
-                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/item/update/reserve").hasRole("SYSTEM")
-                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/location/add").hasRole("SYSTEM")
-                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/location/get/uuid/").hasRole("SYSTEM")
-                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/location/update").hasRole("SYSTEM")
+                        .requestMatchers(
+                                MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/inventory/add",
+                                MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/inventory/get/uuid/",
+                                MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/item/add",
+                                MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/item/get/uuid/",
+                                MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/item/update/stock",
+                                MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/item/update/name",
+                                MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/item/update/reserve",
+                                MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/location/add",
+                                MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/location/get/uuid/",
+                                MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/location/update"
+                        ).hasRole(UserRoles.SYSTEM.getName())
                         .anyRequest().authenticated()
                 )
                 .addFilterAfter(new TokenGlobalFilter(), UsernamePasswordAuthenticationFilter.class)

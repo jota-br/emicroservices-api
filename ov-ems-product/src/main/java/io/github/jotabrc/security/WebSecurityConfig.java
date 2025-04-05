@@ -1,5 +1,6 @@
 package io.github.jotabrc.security;
 
+import io.github.jotabrc.ov_auth_validator.util.UserRoles;
 import io.github.jotabrc.ovauth.TokenGlobalFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,12 +36,18 @@ public class WebSecurityConfig {
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/product/add").permitAll()
                         .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/product/get/name/").permitAll()
                         .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/product/get/category/").permitAll()
                         .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/product/get/uuid/").permitAll()
-                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/product/update").permitAll()
-                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/product/update/price").permitAll()
+
+                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/product/add")
+                        .hasAnyRole(UserRoles.ADMIN.getName(), UserRoles.SYSTEM.getName())
+
+                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/product/update")
+                        .hasAnyRole(UserRoles.ADMIN.getName(), UserRoles.SYSTEM.getName())
+
+                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/product/update/price")
+                        .hasAnyRole(UserRoles.ADMIN.getName(), UserRoles.SYSTEM.getName())
                         .requestMatchers(SWAGGER_WHITELIST).permitAll()
                         .anyRequest().authenticated()
                 )

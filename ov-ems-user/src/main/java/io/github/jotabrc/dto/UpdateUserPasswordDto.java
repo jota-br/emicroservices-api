@@ -12,6 +12,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 public class UpdateUserPasswordDto {
 
+    @ValidateField(fieldName = "uuid", message = "Invalid UUID")
     private final String uuid;
 
     @ValidateField(fieldName = "password", message = "Invalid Password")

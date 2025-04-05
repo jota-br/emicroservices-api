@@ -1,5 +1,6 @@
 package io.github.jotabrc.dto;
 
+import io.github.jotabrc.ov_annotation_validator.annotation.ValidateField;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,6 +16,8 @@ public class OrderDetailDto {
 
     private final String uuid;
     private final long orderId;
+
+    @ValidateField(fieldName = "uuid", message = "Invalid UUID")
     private final String productUuid;
     private final String productName;
     private final int quantity;

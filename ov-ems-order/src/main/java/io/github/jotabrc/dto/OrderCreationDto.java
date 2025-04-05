@@ -1,6 +1,8 @@
 package io.github.jotabrc.dto;
 
 import io.github.jotabrc.model.OrderStatus;
+import io.github.jotabrc.ov_annotation_validator.annotation.ValidateField;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,7 +19,10 @@ import java.util.List;
 public class OrderCreationDto {
 
     private final String uuid;
+
+    @ValidateField(fieldName = "uuid", message = "Invalid UUID")
     private final String userUuid;
+
     private final String userEmail;
     private final String username;
     private final String shippingAddress;
@@ -26,6 +31,8 @@ public class OrderCreationDto {
     private final BigDecimal totalAmount;
     private final LocalDateTime updatedAt;
     private final OrderStatus status;
+
+    @Valid
     private final List<OrderDetailDto> orderDetails;
 
 }

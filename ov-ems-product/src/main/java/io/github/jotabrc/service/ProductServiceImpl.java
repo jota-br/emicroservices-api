@@ -3,14 +3,10 @@ package io.github.jotabrc.service;
 import io.github.jotabrc.document.Category;
 import io.github.jotabrc.document.Image;
 import io.github.jotabrc.document.Product;
-import io.github.jotabrc.dto.CategoryDto;
-import io.github.jotabrc.dto.ImageDto;
-import io.github.jotabrc.dto.ProductDto;
-import io.github.jotabrc.dto.ProductPriceDto;
+import io.github.jotabrc.dto.*;
 import io.github.jotabrc.handler.DocumentAlreadyExistsException;
 import io.github.jotabrc.handler.DocumentNotFoundException;
 import io.github.jotabrc.repository.ProductRepository;
-import jakarta.validation.Valid;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -24,7 +20,6 @@ import java.util.UUID;
 @Validated
 @Service
 public class ProductServiceImpl implements ProductService {
-
     private final ProductRepository productRepository;
     private final MongoTemplate mongoTemplate;
 
@@ -56,19 +51,19 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public String add(@Valid final ProductDto productDto) {
-        boolean productExists = productRepository.findByName(productDto.getName())
+    public String add(final AddProductDto addProductDto) {
+        boolean productExists = productRepository.findByName(addProductDto.getName())
                 .isPresent();
 
         if (productExists) throw new DocumentAlreadyExistsException("Product with name %s already exists"
-                .formatted(productDto.getName()));
+                .formatted(addProductDto.getName()));
 
-        Product product = build(productDto);
+        Product product = build(addProductDto);
         return productRepository.save(product).getUuid();
     }
 
     @Override
-    public void update(@Valid final ProductDto productDto) {
+    public void update(final ProductDto productDto) {
         boolean exists = productRepository.existsByUuid(productDto.getUuid());
 
         if (!exists) throw new DocumentNotFoundException("Product with uuid %s not found".formatted(productDto.getUuid()));
@@ -123,15 +118,15 @@ public class ProductServiceImpl implements ProductService {
     private record QueryAndUpdate(Query query, Update update) {
     }
 
-    private Product build(final ProductDto productDto) {
+    private Product build(final AddProductDto addProductDto) {
         return Product
                 .builder()
                 .uuid(UUID.randomUUID().toString())
-                .name(productDto.getName())
-                .description(productDto.getDescription())
-                .price(productDto.getPrice())
-                .isActive(productDto.isActive())
-                .categories(productDto.getCategories().stream()
+                .name(addProductDto.getName())
+                .description(addProductDto.getDescription())
+                .price(addProductDto.getPrice())
+                .isActive(addProductDto.isActive())
+                .categories(addProductDto.getCategories().stream()
                         .map(categoryDto -> Category
                                 .builder()
                                 .name(categoryDto.getName())
@@ -139,7 +134,7 @@ public class ProductServiceImpl implements ProductService {
                                 .isActive(categoryDto.isActive())
                                 .build())
                         .toList())
-                .images(productDto.getImages().stream()
+                .images(addProductDto.getImages().stream()
                         .map(imageDto -> Image
                                 .builder()
                                 .imagePath(imageDto.getImagePath())

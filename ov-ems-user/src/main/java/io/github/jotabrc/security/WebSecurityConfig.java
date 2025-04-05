@@ -1,5 +1,6 @@
 package io.github.jotabrc.security;
 
+import io.github.jotabrc.ov_auth_validator.util.UserRoles;
 import io.github.jotabrc.ovauth.TokenGlobalFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,13 +45,25 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(SWAGGER_WHITELIST).permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
+
                         .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/user/login").permitAll()
                         .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/user/register").permitAll()
-                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/user/add/address").hasAnyRole("USERS", "ADMINS")
-                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/user/update").hasAnyRole("USERS", "ADMINS")
-                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/user/update/password").hasAnyRole("USERS", "ADMINS")
-                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/user/get/uuid/").hasAnyRole("USERS", "ADMINS")
-                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/address/get/uuid/").hasAnyRole("USERS", "ADMINS")
+
+                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/user/add/address")
+                        .hasAnyRole(UserRoles.USER.getName(), UserRoles.ADMIN.getName())
+
+                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/user/update")
+                        .hasAnyRole(UserRoles.USER.getName(), UserRoles.ADMIN.getName())
+
+                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/user/update/password")
+                        .hasAnyRole(UserRoles.USER.getName(), UserRoles.ADMIN.getName())
+
+                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/user/get/uuid/")
+                        .hasAnyRole(UserRoles.USER.getName(), UserRoles.ADMIN.getName())
+
+                        .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/address/get/uuid/")
+                        .hasAnyRole(UserRoles.USER.getName(), UserRoles.ADMIN.getName())
+
                         .anyRequest().permitAll()
                 )
                 .addFilterAfter(new TokenGlobalFilter(), UsernamePasswordAuthenticationFilter.class)

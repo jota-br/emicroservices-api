@@ -7,6 +7,7 @@ import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 
+@Deprecated
 @Accessors(chain = true)
 @Getter
 @Builder

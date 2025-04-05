@@ -1,6 +1,7 @@
 package io.github.jotabrc.service;
 
 import io.github.jotabrc.dto.*;
+import io.github.jotabrc.ov_annotation_validator.annotation.ValidateField;
 import jakarta.security.auth.message.AuthException;
 import jakarta.validation.Valid;
 import org.springframework.validation.annotation.Validated;
@@ -12,13 +13,13 @@ public interface UserService {
 
     String add(@Valid AddUserDto addUserDto) throws NoSuchAlgorithmException;
 
-    void update(UpdateUserDto updateUserDto);
+    void update(@Valid UpdateUserDto updateUserDto);
 
-    void updatePassword(UpdateUserPasswordDto updateUserPasswordDto) throws NoSuchAlgorithmException;
+    void updatePassword(@Valid UpdateUserPasswordDto updateUserPasswordDto) throws NoSuchAlgorithmException;
 
-    String addAddress(AddUserAddressDto addUserAddressDto);
+    String addAddress(@Valid AddUserAddressDto addUserAddressDto);
 
-    UserDto getUserByUuid(String uuid);
+    UserDto getUserByUuid(@Valid @ValidateField(fieldName = "uuid", message = "Invalid UUID") String uuid);
 
-    UserSessionDto login(LoginDto loginDto) throws AuthException, NoSuchAlgorithmException;
+    UserSessionDto login(@Valid LoginDto loginDto) throws AuthException, NoSuchAlgorithmException;
 }

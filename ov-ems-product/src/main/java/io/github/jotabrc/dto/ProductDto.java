@@ -16,9 +16,10 @@ import java.util.List;
 @AllArgsConstructor
 public class ProductDto {
 
+    @ValidateField(fieldName = "uuid", message = "Invalid UUID")
     private final String uuid;
 
-    @ValidateField(fieldName = "text255", message = "Invalid Name")
+    @ValidateField(fieldName = "name", message = "Invalid Name")
     private final String name;
 
     @ValidateField(fieldName = "description", message = "Invalid Description")

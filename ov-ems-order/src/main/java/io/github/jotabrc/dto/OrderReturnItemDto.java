@@ -14,10 +14,11 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class OrderReturnItemDto {
 
+    @ValidateField(fieldName = "uuid", message = "Invalid UUID")
     private final String orderUuid;
-    private final String productUuid;
 
-    @ValidateField(fieldName = "name", message = "Invalid Product Name")
+    @ValidateField(fieldName = "uuid", message = "Invalid UUID")
+    private final String productUuid;
     private final String productName;
     private final int quantity;
     private final BigDecimal unitPrice;

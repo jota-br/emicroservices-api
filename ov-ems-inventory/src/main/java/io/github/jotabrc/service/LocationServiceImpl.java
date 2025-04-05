@@ -41,7 +41,7 @@ public class LocationServiceImpl implements LocationService {
     }
 
     @Override
-    public LocationDto getByUuid(String uuid) {
+    public LocationDto getByUuid(final String uuid) {
         Location location = locationRepository.findByUuid(uuid)
                 .orElseThrow(() -> new EntityNotFoundException("Location with uuid %s not found"
                         .formatted(uuid)));
@@ -50,7 +50,7 @@ public class LocationServiceImpl implements LocationService {
     }
 
     @Override
-    public void update(UpdateLocationDto updateLocationDto) {
+    public void update(final UpdateLocationDto updateLocationDto) {
         Location location = locationRepository.findByUuid(updateLocationDto.getUuid())
                 .orElseThrow(() -> new EntityNotFoundException("Location with uuid %s not found"
                         .formatted(updateLocationDto.getUuid())));

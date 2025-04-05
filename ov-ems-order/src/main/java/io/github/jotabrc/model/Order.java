@@ -29,6 +29,9 @@ public class Order {
     @Column(name = "user_uuid", length = 40, nullable = false)
     private String userUuid;
 
+    @Column(length = 50, nullable = false)
+    private String username;
+
     @Column(name = "user_email", length = 320, nullable = false)
     private String userEmail;
 

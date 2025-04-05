@@ -92,12 +92,12 @@
 		<dependency>
 			<groupId>io.github.jotabrc</groupId>
 			<artifactId>ov-auth-validator</artifactId>
-			<version>1.0.0</version>
+			<version>1.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>io.github.jotabrc</groupId>
 			<artifactId>ov-annotation-validator</artifactId>
-			<version>1.0.6</version>
+			<version>1.0.7</version>
 		</dependency>
 	</dependencies>
 

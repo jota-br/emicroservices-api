@@ -5,6 +5,7 @@ import io.github.jotabrc.model.Order;
 import io.github.jotabrc.model.OrderDetail;
 import io.github.jotabrc.model.OrderStatus;
 import io.github.jotabrc.model.OrderStatusHistory;
+import io.github.jotabrc.ov_auth_validator.authorization.UsernameAuthorizationValidator;
 import io.github.jotabrc.repository.OrderRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
@@ -18,14 +19,17 @@ import java.util.function.Function;
 @Service
 public class OrderServiceImpl implements OrderService {
 
+    private final UsernameAuthorizationValidator usernameAuthorizationValidator;
     private final OrderRepository orderRepository;
 
-    public OrderServiceImpl(OrderRepository orderRepository) {
+    public OrderServiceImpl(UsernameAuthorizationValidator usernameAuthorizationValidator, OrderRepository orderRepository) {
+        this.usernameAuthorizationValidator = usernameAuthorizationValidator;
         this.orderRepository = orderRepository;
     }
 
     @Override
     public String add(final OrderCreationDto orderCreationDto) {
+        usernameAuthorizationValidator.validate(orderCreationDto.getUsername());
         Order order = build(orderCreationDto);
         return orderRepository.save(order).getUuid();
     }
@@ -34,6 +38,8 @@ public class OrderServiceImpl implements OrderService {
     public OrderDto getByOrderUuid(final String uuid) {
         Order order = orderRepository.findByUuid(uuid)
                 .orElseThrow(() -> new EntityNotFoundException("Order with uuid %s not found".formatted(uuid)));
+
+        usernameAuthorizationValidator.validate(order.getUsername());
         return toDto(order);
     }
 
@@ -43,6 +49,8 @@ public class OrderServiceImpl implements OrderService {
 
         if(orders.isEmpty()) throw  new EntityNotFoundException("No Order found with user uuid %s".formatted(uuid));
 
+        orders.forEach(order -> usernameAuthorizationValidator.validate(order.getUsername()));
+
         return orders.stream().map(this::toDto).toList();
     }
 
@@ -50,6 +58,8 @@ public class OrderServiceImpl implements OrderService {
     public void updateOrderStatus(final OrderStatusUpdateDto orderStatusUpdateDto) {
         Order order = orderRepository.findByUuid(orderStatusUpdateDto.getUuid())
                 .orElseThrow(() -> new EntityNotFoundException("Order with uuid %s not found".formatted(orderStatusUpdateDto.getUuid())));
+
+        usernameAuthorizationValidator.validate(order.getUsername());
 
         updateOrderStatus(orderStatusUpdateDto.getStatus(), order);
 
@@ -61,6 +71,8 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findByUuid(uuid)
                 .orElseThrow(() -> new EntityNotFoundException("Order with uuid %s not found".formatted(uuid)));
 
+        usernameAuthorizationValidator.validate(order.getUsername());
+
         updateOrderStatus(OrderStatus.CANCELLED, order);
         buildOrderDetailsToCancel(order.getOrderDetails());
         orderRepository.save(order);
@@ -70,6 +82,8 @@ public class OrderServiceImpl implements OrderService {
     public void returnItem(final OrderReturnItemDto orderReturnItemDto) {
         Order order = orderRepository.findByUuid(orderReturnItemDto.getOrderUuid())
                 .orElseThrow(() -> new EntityNotFoundException("Order with uuid %s not found".formatted(orderReturnItemDto.getOrderUuid())));
+
+        usernameAuthorizationValidator.validate(order.getUsername());
 
         if (LocalDateTime.now().isBefore(order.getOrderDate().minusDays(30)))
             throw new IllegalStateException("Order cannot be returned");
@@ -87,6 +101,7 @@ public class OrderServiceImpl implements OrderService {
                 .builder()
                 .uuid(UUID.randomUUID().toString())
                 .userUuid(orderCreationDto.getUserUuid())
+                .username(orderCreationDto.getUsername())
                 .userEmail(orderCreationDto.getUserEmail())
                 .shippingAddress(orderCreationDto.getShippingAddress())
                 .billingAddress(orderCreationDto.getBillingAddress())
@@ -168,6 +183,7 @@ public class OrderServiceImpl implements OrderService {
         return OrderDto.builder()
                 .uuid(UUID.randomUUID().toString())
                 .userUuid(order.getUserUuid())
+                .username(order.getUsername())
                 .userEmail(order.getUserEmail())
                 .shippingAddress(order.getShippingAddress())
                 .billingAddress(order.getBillingAddress())

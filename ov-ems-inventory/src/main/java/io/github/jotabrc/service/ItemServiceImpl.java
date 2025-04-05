@@ -43,7 +43,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto getByUuid(String uuid) {
+    public ItemDto getByUuid(final String uuid) {
         Item item = itemRepository.findByUuid(uuid)
                 .orElseThrow(() -> new EntityNotFoundException("Item with uuid %s not found"
                         .formatted(uuid)));
@@ -78,7 +78,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public void updateReserve(UpdateProductStockDto updateProductStockDto) {
+    public void updateReserve(final UpdateProductStockDto updateProductStockDto) {
         Item item = itemRepository
                 .findByLocationUuidAndProductUuid(
                         updateProductStockDto.getLocationUuid(), updateProductStockDto.getProductUuid()

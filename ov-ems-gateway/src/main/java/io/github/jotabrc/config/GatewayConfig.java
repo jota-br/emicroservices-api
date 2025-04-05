@@ -1,5 +1,6 @@
 package io.github.jotabrc.config;
 
+import io.github.jotabrc.ov_auth_validator.util.UserRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
@@ -66,8 +67,38 @@ public class GatewayConfig implements WebFluxConfigurer {
         http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(auth -> auth
+                        // User API
                         .pathMatchers("/user/login").permitAll()
                         .pathMatchers("/user/register").permitAll()
+
+                        .pathMatchers("/user/add/address")
+                        .hasAnyRole(UserRoles.USER.getName(), UserRoles.ADMIN.getName())
+
+                        .pathMatchers("/user/update")
+                        .hasAnyRole(UserRoles.USER.getName(), UserRoles.ADMIN.getName())
+
+                        .pathMatchers("/user/update/password")
+                        .hasAnyRole(UserRoles.USER.getName(), UserRoles.ADMIN.getName())
+
+                        .pathMatchers("/user/get/uuid/")
+                        .hasAnyRole(UserRoles.USER.getName(), UserRoles.ADMIN.getName())
+
+                        .pathMatchers("/address/get/uuid/")
+                        .hasAnyRole(UserRoles.USER.getName(), UserRoles.ADMIN.getName())
+
+                        // Product API
+                        .pathMatchers("/product/get/name/").permitAll()
+                        .pathMatchers("/product/get/category/").permitAll()
+                        .pathMatchers("/product/get/uuid/").permitAll()
+
+                        .pathMatchers("/product/add")
+                        .hasAnyRole(UserRoles.ADMIN.getName(), UserRoles.SYSTEM.getName())
+
+                        .pathMatchers("/product/update")
+                        .hasAnyRole(UserRoles.ADMIN.getName(), UserRoles.SYSTEM.getName())
+
+                        .pathMatchers("/product/update/price")
+                        .hasAnyRole(UserRoles.ADMIN.getName(), UserRoles.SYSTEM.getName())
                         .anyExchange().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
