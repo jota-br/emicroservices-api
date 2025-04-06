@@ -13,6 +13,7 @@ RESTful API for adding and retrieving products, placing orders and authenticate 
 - Using shared libraries:
   - [`ov-auth`](https://github.com/jotabrc/ov-auth) for Spring WEB (MVC) Token Creation and Authentication.
   - [`ov-annotation-validator`](https://github.com/jotabrc/ov-annotation-validator) for user input validation.
+  - [`ov-sanitizer`](https://github.com/jotabrc/ov-sanitizer) for user input sanitization.
 
 ### Status
 
@@ -24,19 +25,19 @@ RESTful API for adding and retrieving products, placing orders and authenticate 
     - [x] ExceptionHandler
     - [x] Service
     - [x] Repository
-    - [ ] Validation
+    - [x] Validation
 - Order
     - [x] Controller
     - [x] ExceptionHandler
     - [x] Service
     - [x] Repository
-    - [ ] Validation
+    - [x] Validation
 - Inventory
     - [x] Controller
     - [x] ExceptionHandler
     - [x] Service
     - [x] Repository
-    - [ ] Validation
+    - [x] Validation
 - User
     - [x] Controller
     - [x] ExceptionHandler
@@ -44,4 +45,4 @@ RESTful API for adding and retrieving products, placing orders and authenticate 
     - [x] Repository
     - [X] JWT
     - [X] Login
-    - [ ] Validation
+    - [x] Validation
