@@ -8,6 +8,7 @@ import io.github.jotabrc.ovauth.TokenConfig;
 import io.github.jotabrc.ovauth.TokenCreator;
 import io.github.jotabrc.ovauth.TokenObject;
 import io.github.jotabrc.repository.*;
+import io.github.jotabrc.util.sanitization.UserSanitizer;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.security.auth.message.AuthException;
@@ -27,6 +28,7 @@ import static io.github.jotabrc.util.ToDto.toDto;
 @Service
 public class UserServiceImpl implements UserService {
 
+    private final UserSanitizer userSanitizer;
     private final UsernameAuthorizationValidator usernameAuthorizationValidator;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -35,8 +37,9 @@ public class UserServiceImpl implements UserService {
     private final CountryRepository countryRepository;
 
     @Autowired
-    public UserServiceImpl(UsernameAuthorizationValidator usernameAuthorizationValidator, UserRepository userRepository, RoleRepository roleRepository, CityRepository cityRepository,
+    public UserServiceImpl(UserSanitizer userSanitizer, UsernameAuthorizationValidator usernameAuthorizationValidator, UserRepository userRepository, RoleRepository roleRepository, CityRepository cityRepository,
                            StateRepository stateRepository, CountryRepository countryRepository) {
+        this.userSanitizer = userSanitizer;
         this.usernameAuthorizationValidator = usernameAuthorizationValidator;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
@@ -57,7 +60,7 @@ public class UserServiceImpl implements UserService {
         if (exists) throw new EntityExistsException("Phone %s already in use".formatted(addUserDto.getPhone()));
 
         User user = build(addUserDto);
-
+        sanitize(user);
         return userRepository.save(user).getUuid();
     }
 
@@ -69,6 +72,7 @@ public class UserServiceImpl implements UserService {
         usernameAuthorizationValidator.validate(user.getUsername());
 
         updateUser(user, updateUserDto);
+        sanitize(user);
 
         userRepository.save(user);
     }
@@ -94,6 +98,7 @@ public class UserServiceImpl implements UserService {
 
         user.getAddress().forEach(address -> address.setActive(false));
         addAddress(user, addUserAddressDto);
+        sanitize(user);
         return userRepository.save(user).getAddress().get(user.getAddress().size() - 1).getUuid();
     }
 
@@ -128,6 +133,10 @@ public class UserServiceImpl implements UserService {
                 .user(user.getUsername())
                 .token(TokenCreator.create(TokenConfig.PREFIX, TokenConfig.KEY, jwtObject))
                 .build();
+    }
+
+    private void sanitize(final User user) {
+        userSanitizer.sanitize(user);
     }
 
     private User build(final AddUserDto addUserDto) throws NoSuchAlgorithmException {

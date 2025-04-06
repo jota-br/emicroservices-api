@@ -13,3 +13,8 @@ logging:
     org.springframework.cloud.gateway: TRACE
     reactor.netty.http.client: DEBUG
     org.springframework.security: DEBUG
+
+exception:
+  message:
+    role: User authorization denied
+    username: User authorization denied

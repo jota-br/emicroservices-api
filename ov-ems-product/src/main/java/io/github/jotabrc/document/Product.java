@@ -1,8 +1,6 @@
 package io.github.jotabrc.document;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 import lombok.experimental.Accessors;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -15,29 +13,31 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Accessors(chain = true)
+@Setter
 @Getter
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 @Document(collection = "product")
 public class Product {
 
     @Id
-    private final String id;
-    private final String uuid;
-    private final String name;
-    private final String description;
-    private final BigDecimal price;
-    private final boolean isActive;
+    private String id;
+    private String uuid;
+    private String name;
+    private String description;
+    private BigDecimal price;
+    private boolean isActive;
 
     @Version
-    private final int version;
+    private int version;
 
     @CreatedDate
-    private final LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @LastModifiedDate
-    private final LocalDateTime updatedAt;
+    private LocalDateTime updatedAt;
 
-    private final List<Category> categories;
-    private final List<Image> images;
+    private List<Category> categories;
+    private List<Image> images;
 }

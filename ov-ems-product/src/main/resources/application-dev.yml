@@ -8,3 +8,8 @@ spring:
       uri: mongodb+srv://${MONGO_USER}:${MONGO_PASS}@${MONGO_URL}
       database: product
       auto-index-creation=true:
+
+exception:
+  message:
+    role: User authorization denied
+    username: User authorization denied

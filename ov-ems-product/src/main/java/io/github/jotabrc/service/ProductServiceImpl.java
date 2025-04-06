@@ -7,6 +7,7 @@ import io.github.jotabrc.dto.*;
 import io.github.jotabrc.handler.DocumentAlreadyExistsException;
 import io.github.jotabrc.handler.DocumentNotFoundException;
 import io.github.jotabrc.repository.ProductRepository;
+import io.github.jotabrc.util.sanitization.ProductSanitizer;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -20,10 +21,13 @@ import java.util.UUID;
 @Validated
 @Service
 public class ProductServiceImpl implements ProductService {
+
+    private final ProductSanitizer productSanitizer;
     private final ProductRepository productRepository;
     private final MongoTemplate mongoTemplate;
 
-    public ProductServiceImpl(ProductRepository productRepository, MongoTemplate mongoTemplate) {
+    public ProductServiceImpl(ProductSanitizer productSanitizer, ProductRepository productRepository, MongoTemplate mongoTemplate) {
+        this.productSanitizer = productSanitizer;
         this.productRepository = productRepository;
         this.mongoTemplate = mongoTemplate;
     }
@@ -39,7 +43,8 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductDto> getByCategories(final String category) {
         List<Product> product = productRepository.findByCategoryName(category);
 
-        if (product.isEmpty()) throw new DocumentNotFoundException("Product with category %s not found".formatted(category));
+        if (product.isEmpty())
+            throw new DocumentNotFoundException("Product with category %s not found".formatted(category));
         return toDto(product);
     }
 
@@ -59,6 +64,7 @@ public class ProductServiceImpl implements ProductService {
                 .formatted(addProductDto.getName()));
 
         Product product = build(addProductDto);
+        productSanitizer.sanitize(product);
         return productRepository.save(product).getUuid();
     }
 
@@ -66,7 +72,8 @@ public class ProductServiceImpl implements ProductService {
     public void update(final ProductDto productDto) {
         boolean exists = productRepository.existsByUuid(productDto.getUuid());
 
-        if (!exists) throw new DocumentNotFoundException("Product with uuid %s not found".formatted(productDto.getUuid()));
+        if (!exists)
+            throw new DocumentNotFoundException("Product with uuid %s not found".formatted(productDto.getUuid()));
 
         QueryAndUpdate queryAndUpdate = getQueryAndUpdate(productDto);
 
@@ -89,33 +96,6 @@ public class ProductServiceImpl implements ProductService {
             update.set("price", productPriceDto.getPrice());
 
         mongoTemplate.updateFirst(query, update, Product.class);
-    }
-
-    private QueryAndUpdate getQueryAndUpdate(final ProductDto productDto) {
-        Query query = new Query(Criteria.where("uuid").is(productDto.getUuid()));
-        Update update = new Update()
-                .set("name", productDto.getName())
-                .set("description", productDto.getDescription())
-                .set("isActive", productDto.isActive())
-                .set("categories", productDto.getCategories().stream()
-                        .map(categoryDto -> Category
-                                .builder()
-                                .name(categoryDto.getName())
-                                .description(categoryDto.getDescription())
-                                .isActive(categoryDto.isActive())
-                                .build())
-                        .toList())
-                .set("images", productDto.getImages().stream()
-                        .map(imageDto -> Image
-                                .builder()
-                                .imagePath(imageDto.getImagePath())
-                                .isMain(imageDto.isMain())
-                                .build())
-                        .toList());
-        return new QueryAndUpdate(query, update);
-    }
-
-    private record QueryAndUpdate(Query query, Update update) {
     }
 
     private Product build(final AddProductDto addProductDto) {
@@ -144,6 +124,46 @@ public class ProductServiceImpl implements ProductService {
                 .build();
     }
 
+    private QueryAndUpdate getQueryAndUpdate(final ProductDto productDto) {
+        Product product = build(productDto);
+        productSanitizer.sanitize(product);
+        Query query = new Query(Criteria.where("uuid").is(product.getUuid()));
+        Update update = new Update()
+                .set("name", product.getName())
+                .set("description", product.getDescription())
+                .set("isActive", product.isActive())
+                .set("categories", product.getCategories())
+                .set("images", product.getImages());
+        return new QueryAndUpdate(query, update);
+    }
+
+    private record QueryAndUpdate(Query query, Update update) {
+    }
+
+    private Product build(final ProductDto productDto) {
+        return Product
+                .builder()
+                .name(productDto.getName())
+                .description(productDto.getDescription())
+                .isActive(productDto.isActive())
+                .categories(productDto.getCategories().stream()
+                        .map(categoryDto -> Category
+                                .builder()
+                                .name(categoryDto.getName())
+                                .description(categoryDto.getDescription())
+                                .isActive(categoryDto.isActive())
+                                .build())
+                        .toList())
+                .images(productDto.getImages().stream()
+                        .map(imageDto -> Image
+                                .builder()
+                                .imagePath(imageDto.getImagePath())
+                                .isMain(imageDto.isMain())
+                                .build())
+                        .toList())
+                .build();
+    }
+
     private List<ProductDto> toDto(final List<Product> products) {
         return products.stream()
                 .map(this::toDto)
@@ -151,28 +171,24 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private ProductDto toDto(final Product product) {
-        return ProductDto
-                .builder()
-                .uuid(product.getUuid())
-                .name(product.getName())
-                .description(product.getDescription())
-                .price(product.getPrice())
-                .isActive(product.isActive())
-                .categories(product.getCategories().stream()
+        return new ProductDto(
+                product.getName(), product.getDescription(), product.getPrice(), product.isActive(),
+                product.getCategories().stream()
                         .map(categoryDto -> CategoryDto
                                 .builder()
                                 .name(categoryDto.getName())
                                 .description(categoryDto.getDescription())
                                 .isActive(categoryDto.isActive())
                                 .build())
-                        .toList())
-                .images(product.getImages().stream()
+                        .toList(),
+                product.getImages().stream()
                         .map(imageDto -> ImageDto
                                 .builder()
                                 .imagePath(imageDto.getImagePath())
                                 .isMain(imageDto.isMain())
                                 .build())
-                        .toList())
-                .build();
+                        .toList(),
+                product.getUuid()
+        );
     }
 }

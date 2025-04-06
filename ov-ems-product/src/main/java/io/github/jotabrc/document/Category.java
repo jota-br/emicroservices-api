@@ -4,9 +4,11 @@ import lombok.*;
 import lombok.experimental.Accessors;
 
 @Accessors(chain = true)
+@Setter
 @Getter
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class Category {
 
     private String name;

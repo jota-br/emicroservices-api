@@ -1,35 +1,19 @@
 package io.github.jotabrc.dto;
 
 import io.github.jotabrc.ov_annotation_validator.annotation.ValidateField;
-import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-@Accessors(chain = true)
 @Getter
-@Builder
-@AllArgsConstructor
-public class ProductDto {
+public class ProductDto extends AbsProductDto {
+
+    public ProductDto(String name, String description, BigDecimal price, boolean isActive, List<CategoryDto> categories, List<ImageDto> images, String uuid) {
+        super(name, description, price, isActive, categories, images);
+        this.uuid = uuid;
+    }
 
     @ValidateField(fieldName = "uuid", message = "Invalid UUID")
     private final String uuid;
-
-    @ValidateField(fieldName = "name", message = "Invalid Name")
-    private final String name;
-
-    @ValidateField(fieldName = "description", message = "Invalid Description")
-    private final String description;
-    private final BigDecimal price;
-    private final boolean isActive;
-
-    @Valid
-    private final List<CategoryDto> categories;
-
-    @Valid
-    private final List<ImageDto> images;
 }
