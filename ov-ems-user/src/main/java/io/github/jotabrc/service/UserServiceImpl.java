@@ -5,7 +5,6 @@ import io.github.jotabrc.model.*;
 import io.github.jotabrc.ov_auth_validator.authorization.UsernameAuthorizationValidator;
 import io.github.jotabrc.ov_auth_validator.util.UserRoles;
 import io.github.jotabrc.ovauth.TokenConfig;
-import io.github.jotabrc.ovauth.TokenCreator;
 import io.github.jotabrc.ovauth.TokenObject;
 import io.github.jotabrc.repository.*;
 import io.github.jotabrc.util.sanitization.UserSanitizer;
@@ -131,7 +130,7 @@ public class UserServiceImpl implements UserService {
         return UserSessionDto
                 .builder()
                 .user(user.getUsername())
-                .token(TokenCreator.create(TokenConfig.PREFIX, TokenConfig.KEY, jwtObject))
+//                .token(TokenCreator.create(TokenConfig.PREFIX, TokenConfig.KEY, jwtObject))
                 .build();
     }
 

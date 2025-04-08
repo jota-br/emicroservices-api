@@ -3,6 +3,7 @@ package io.github.jotabrc.controller;
 import io.github.jotabrc.dto.*;
 import io.github.jotabrc.response.ResponseBody;
 import io.github.jotabrc.response.ResponsePayload;
+import io.github.jotabrc.service.ActivationTokenService;
 import io.github.jotabrc.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.security.auth.message.AuthException;
@@ -24,10 +25,12 @@ import static io.github.jotabrc.controller.ControllerDefaults.MAPPING_VERSION_SU
 public class UserController {
 
     private final UserService userService;
+    private final ActivationTokenService activationTokenService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, ActivationTokenService activationTokenService) {
         this.userService = userService;
+        this.activationTokenService = activationTokenService;
     }
 
     @PostMapping("/register")
@@ -40,6 +43,7 @@ public class UserController {
                 .fromPath(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/user/{uuid}")
                 .buildAndExpand(uuid)
                 .toUri();
+        activationTokenService.add(uuid);
         return ResponseEntity.created(location).body(new ResponsePayload<UserDto>()
                 .setMessage("User inserted with uuid %s".formatted(uuid)));
     }

@@ -42,6 +42,12 @@ public class GatewayConfig implements WebFluxConfigurer {
                         )
                         .uri(serviceConfig.getUserServiceUri()))
 
+                .route(serviceConfig.getUserActivationServiceName(), r -> r.path("/activation-token/**")
+                        .filters(f -> f
+                                .rewritePath(serviceConfig.getUserActivationServicePattern(), serviceConfig.getUserActivationServiceReplacement())
+                        )
+                        .uri(serviceConfig.getUserActivationServiceUri()))
+
                 .route(serviceConfig.getInventoryServiceName(), r -> r.path("/inventory/**")
                         .filters(f -> f
                                 .rewritePath(serviceConfig.getInventoryServicePattern(), serviceConfig.getInventoryServiceReplacement())
@@ -70,6 +76,7 @@ public class GatewayConfig implements WebFluxConfigurer {
                         // User API
                         .pathMatchers("/user/login").permitAll()
                         .pathMatchers("/user/register").permitAll()
+                        .pathMatchers("/activation-token/activate/**").permitAll()
 
                         .pathMatchers("/user/add/address")
                         .hasAnyRole(UserRoles.USER.getName(), UserRoles.ADMIN.getName())

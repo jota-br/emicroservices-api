@@ -18,6 +18,11 @@ public class ServiceConfiguration {
     private String userServicePattern;
     private String userServiceReplacement;
 
+    private String userActivationServiceName;
+    private String userActivationServiceUri;
+    private String userActivationServicePattern;
+    private String userActivationServiceReplacement;
+
     private String inventoryServiceName;
     private String inventoryServiceUri;
     private String inventoryServicePattern;

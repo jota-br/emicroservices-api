@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class UserSanitizer implements SanitizerInterface<User, User> {
 
@@ -27,10 +29,12 @@ public class UserSanitizer implements SanitizerInterface<User, User> {
                 .setFirstName(sanitizer.sanitize(user.getFirstName()))
                 .setLastName(sanitizer.sanitize(user.getLastName()))
                 .setAddress(
-                        user.getAddress()
-                                .stream()
-                                .map(addressSanitizer::sanitize)
-                                .toList()
+                        user.getAddress() != null ?
+                                user.getAddress()
+                                        .stream()
+                                        .map(addressSanitizer::sanitize)
+                                        .toList()
+                                : List.of()
                 );
 
         return user;
