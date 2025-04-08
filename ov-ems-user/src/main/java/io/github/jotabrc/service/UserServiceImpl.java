@@ -158,6 +158,7 @@ public class UserServiceImpl implements UserService {
                 .lastName(addUserDto.getLastName())
                 .phone(addUserDto.getPhone())
                 .role(role)
+                .isActive(false)
                 .build();
     }
 
