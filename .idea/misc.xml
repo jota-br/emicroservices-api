@@ -14,7 +14,13 @@
         <option value="$PROJECT_DIR$/ov-ems-inventory/pom.xml" />
         <option value="$PROJECT_DIR$/ov-ems-gateway/pom.xml" />
         <option value="$PROJECT_DIR$/ov-ems-user/pom.xml" />
+        <option value="$PROJECT_DIR$/ov-ems-user-validation-token/pom.xml" />
       </list>
+    </option>
+    <option name="ignoredFiles">
+      <set>
+        <option value="$PROJECT_DIR$/ov-ems-user-validation-token/pom.xml" />
+      </set>
     </option>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_17" project-jdk-name="17" project-jdk-type="JavaSDK">

@@ -90,7 +90,7 @@ public class ProductController {
         return ResponseEntity
                 .ok(
                         new ResponsePayload<ProductDto>()
-                                .setMessage("Product stock and price updated")
+                                .setMessage("Product price updated")
                 );
     }
 }
