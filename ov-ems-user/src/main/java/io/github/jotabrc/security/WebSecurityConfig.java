@@ -1,7 +1,7 @@
 package io.github.jotabrc.security;
 
 import io.github.jotabrc.ov_auth_validator.util.UserRoles;
-import io.github.jotabrc.ovauth.TokenGlobalFilter;
+import io.github.jotabrc.ovauth.jwt.TokenGlobalFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

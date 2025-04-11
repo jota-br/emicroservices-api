@@ -18,7 +18,7 @@ public interface ProductService {
 
     ProductDto getByUuid(@Valid @ValidateField(fieldName = "uuid", message = "Invalid UUID") String uuid);
 
-    String add(@Valid AddProductDto addProductDto);
+    ProductDto add(@Valid AddProductDto addProductDto);
 
     void update(@Valid ProductDto productDto);
 

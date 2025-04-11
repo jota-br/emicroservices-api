@@ -1,7 +1,7 @@
 package io.github.jotabrc.security;
 
 import io.github.jotabrc.ov_auth_validator.util.UserRoles;
-import io.github.jotabrc.ovauth.TokenGlobalFilter;
+import io.github.jotabrc.ovauth.jwt.TokenGlobalFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -39,6 +39,7 @@ public class WebSecurityConfig {
                         .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/product/get/name/").permitAll()
                         .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/product/get/category/").permitAll()
                         .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/product/get/uuid/").permitAll()
+                        .requestMatchers(SWAGGER_WHITELIST).permitAll()
 
                         .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/product/add")
                         .hasAnyRole(UserRoles.ADMIN.getName(), UserRoles.SYSTEM.getName())
@@ -48,7 +49,6 @@ public class WebSecurityConfig {
 
                         .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/product/update/price")
                         .hasAnyRole(UserRoles.ADMIN.getName(), UserRoles.SYSTEM.getName())
-                        .requestMatchers(SWAGGER_WHITELIST).permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterAfter(new TokenGlobalFilter(), UsernamePasswordAuthenticationFilter.class)

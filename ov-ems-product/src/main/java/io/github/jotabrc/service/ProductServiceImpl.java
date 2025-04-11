@@ -56,7 +56,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public String add(final AddProductDto addProductDto) {
+    public ProductDto add(final AddProductDto addProductDto) {
         boolean productExists = productRepository.findByName(addProductDto.getName())
                 .isPresent();
 
@@ -65,7 +65,7 @@ public class ProductServiceImpl implements ProductService {
 
         Product product = build(addProductDto);
         productSanitizer.sanitize(product);
-        return productRepository.save(product).getUuid();
+        return toDto(productRepository.save(product));
     }
 
     @Override

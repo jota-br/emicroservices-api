@@ -32,6 +32,17 @@ public class GatewayConfig implements WebFluxConfigurer {
     @Autowired
     private ServiceConfiguration serviceConfig;
 
+    private static final String[] SWAGGER_WHITELIST = {
+            "/v3/api-docs/**",
+            "/swagger-resources",
+            "/swagger-resources/**",
+            "/configuration/ui",
+            "/configuration/security",
+            "/swagger-ui.html",
+            "/swagger-ui/**",
+            "/webjars/**"
+    };
+
     @Bean
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
         System.out.println(serviceConfig.getUserServiceReplacement());
@@ -41,6 +52,18 @@ public class GatewayConfig implements WebFluxConfigurer {
                                 .rewritePath(serviceConfig.getUserServicePattern(), serviceConfig.getUserServiceReplacement())
                         )
                         .uri(serviceConfig.getUserServiceUri()))
+
+                .route(serviceConfig.getUserServiceH2Name(), r -> r.path("/h2-console/**")
+                        .filters(f -> f
+                                .rewritePath(serviceConfig.getUserServiceH2Pattern(), serviceConfig.getUserServiceH2Replacement())
+                        )
+                        .uri(serviceConfig.getUserServiceH2Uri()))
+
+                .route(serviceConfig.getUserServiceSwaggerName(), r -> r.path(SWAGGER_WHITELIST)
+                        .filters(f -> f
+                                .rewritePath(serviceConfig.getUserServiceSwaggerPattern(), serviceConfig.getUserServiceSwaggerReplacement())
+                        )
+                        .uri(serviceConfig.getUserServiceSwaggerUri()))
 
                 .route(serviceConfig.getUserActivationServiceName(), r -> r.path("/activation-token/**")
                         .filters(f -> f
@@ -74,6 +97,8 @@ public class GatewayConfig implements WebFluxConfigurer {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(auth -> auth
                         // User API
+                        .pathMatchers("/h2-console").permitAll()
+                        .pathMatchers(SWAGGER_WHITELIST).permitAll()
                         .pathMatchers("/user/login").permitAll()
                         .pathMatchers("/user/register").permitAll()
                         .pathMatchers("/activation-token/activate/**").permitAll()

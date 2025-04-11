@@ -18,6 +18,16 @@ public class ServiceConfiguration {
     private String userServicePattern;
     private String userServiceReplacement;
 
+    private String userServiceH2Name;
+    private String userServiceH2Uri;
+    private String userServiceH2Pattern;
+    private String userServiceH2Replacement;
+
+    private String userServiceSwaggerName;
+    private String userServiceSwaggerUri;
+    private String userServiceSwaggerPattern;
+    private String userServiceSwaggerReplacement;
+
     private String userActivationServiceName;
     private String userActivationServiceUri;
     private String userActivationServicePattern;
@@ -37,5 +47,10 @@ public class ServiceConfiguration {
     private String productServiceUri;
     private String productServicePattern;
     private String productServiceReplacement;
+
+    private String productServiceSwaggerName;
+    private String productServiceSwaggerUri;
+    private String productServiceSwaggerPattern;
+    private String productServiceSwaggerReplacement;
 }
 

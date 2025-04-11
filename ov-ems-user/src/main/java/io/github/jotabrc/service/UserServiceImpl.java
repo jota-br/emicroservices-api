@@ -4,8 +4,9 @@ import io.github.jotabrc.dto.*;
 import io.github.jotabrc.model.*;
 import io.github.jotabrc.ov_auth_validator.authorization.UsernameAuthorizationValidator;
 import io.github.jotabrc.ov_auth_validator.util.UserRoles;
-import io.github.jotabrc.ovauth.TokenConfig;
-import io.github.jotabrc.ovauth.TokenObject;
+import io.github.jotabrc.ovauth.jwt.TokenConfig;
+import io.github.jotabrc.ovauth.jwt.TokenCreator;
+import io.github.jotabrc.ovauth.jwt.TokenObject;
 import io.github.jotabrc.repository.*;
 import io.github.jotabrc.util.sanitization.UserSanitizer;
 import jakarta.persistence.EntityExistsException;
@@ -120,17 +121,18 @@ public class UserServiceImpl implements UserService {
         if (!getHash(loginDto.getPassword(), user.getSalt()).equals(user.getHash()))
             throw new AuthException("Password doesn't match");
 
-        TokenObject jwtObject = new TokenObject();
-        jwtObject.setSubject(user.getUsername());
-        jwtObject.setIssuedAt(new Date(System.currentTimeMillis()));
-        jwtObject.setExpiration((new Date(System.currentTimeMillis() + TokenConfig.EXPIRATION)));
-        jwtObject.setRoles(List.of(user.getRole().getName()));
-
+        TokenObject jwtObject = TokenObject
+                .builder()
+                .subject(user.getUsername())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + TokenConfig.EXPIRATION))
+                .roles(List.of(user.getRole().getName()))
+                .build();
 
         return UserSessionDto
                 .builder()
                 .user(user.getUsername())
-//                .token(TokenCreator.create(TokenConfig.PREFIX, TokenConfig.KEY, jwtObject))
+                .token(TokenCreator.create(TokenConfig.PREFIX, TokenConfig.KEY, jwtObject))
                 .build();
     }
 
