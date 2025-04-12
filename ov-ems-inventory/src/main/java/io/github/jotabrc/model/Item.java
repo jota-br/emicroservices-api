@@ -20,20 +20,13 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(nullable = false, length = 40)
+    @Column(name = "product_uuid", nullable = false)
     private String uuid;
 
-    @Column(name = "product_uuid", nullable = false)
-    private String productUuid;
-
     @Column(name = "product_name", nullable = false)
-    private String productName;
+    private String name;
     private int stock;
     private int reserved;
-
-    @ManyToOne
-    @JoinColumn(name = "location_id", nullable = false)
-    private Location location;
 
     @UpdateTimestamp
     @Column(name = "updated_at")

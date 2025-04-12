@@ -16,5 +16,4 @@ public class ItemDto {
     private final String productName;
     private final int stock;
     private final int reserved;
-    private final long locationId;
 }

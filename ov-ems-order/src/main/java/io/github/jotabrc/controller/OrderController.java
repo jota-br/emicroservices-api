@@ -1,10 +1,6 @@
 package io.github.jotabrc.controller;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.github.jotabrc.dto.OrderCreationDto;
 import io.github.jotabrc.dto.OrderDto;
 import io.github.jotabrc.dto.OrderReturnItemDto;
@@ -12,8 +8,15 @@ import io.github.jotabrc.dto.OrderStatusUpdateDto;
 import io.github.jotabrc.response.ResponseBody;
 import io.github.jotabrc.response.ResponsePayload;
 import io.github.jotabrc.service.OrderService;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import static io.github.jotabrc.controller.ControllerDefaults.MAPPING_PREFIX;
@@ -75,7 +78,7 @@ public class OrderController {
     }
 
     @PostMapping("/return")
-    public ResponseEntity<ResponsePayload<OrderDto>> returnItem(@RequestBody final OrderReturnItemDto orderReturnItemDto) {
+    public ResponseEntity<ResponsePayload<OrderDto>> returnItem(@RequestBody final OrderReturnItemDto orderReturnItemDto) throws NoSuchAlgorithmException, InvalidKeyException, JsonProcessingException {
         orderService.returnItem(orderReturnItemDto);
         return ResponseEntity.ok(new ResponsePayload<OrderDto>()
                 .setMessage("Product with uuid %s return requested".formatted(orderReturnItemDto.getProductUuid())));

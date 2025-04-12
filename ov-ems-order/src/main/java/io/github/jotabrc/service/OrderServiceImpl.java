@@ -1,16 +1,21 @@
 package io.github.jotabrc.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.github.jotabrc.dto.*;
 import io.github.jotabrc.model.Order;
 import io.github.jotabrc.model.OrderDetail;
 import io.github.jotabrc.model.OrderStatus;
 import io.github.jotabrc.model.OrderStatusHistory;
 import io.github.jotabrc.ov_auth_validator.authorization.UsernameAuthorizationValidator;
+import io.github.jotabrc.ov_kafka_cp.TopicConstant;
+import io.github.jotabrc.ov_kafka_cp.broker.Producer;
 import io.github.jotabrc.repository.OrderRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -21,17 +26,22 @@ public class OrderServiceImpl implements OrderService {
 
     private final UsernameAuthorizationValidator usernameAuthorizationValidator;
     private final OrderRepository orderRepository;
+    private final Producer producer;
 
-    public OrderServiceImpl(UsernameAuthorizationValidator usernameAuthorizationValidator, OrderRepository orderRepository) {
+    public OrderServiceImpl(UsernameAuthorizationValidator usernameAuthorizationValidator, OrderRepository orderRepository, Producer producer) {
         this.usernameAuthorizationValidator = usernameAuthorizationValidator;
         this.orderRepository = orderRepository;
+        this.producer = producer;
     }
 
     @Override
     public String add(final OrderCreationDto orderCreationDto) {
         usernameAuthorizationValidator.validate(orderCreationDto.getUsername());
         Order order = build(orderCreationDto);
-        return orderRepository.save(order).getUuid();
+        order = orderRepository.save(order);
+
+        callProducer(order, TopicConstant.INVENTORY_ADD_ITEM);
+        return order.getUuid();
     }
 
     @Override
@@ -47,7 +57,7 @@ public class OrderServiceImpl implements OrderService {
     public List<OrderDto> getByUserUuid(final String uuid) {
         List<Order> orders = orderRepository.findByUserUuid(uuid);
 
-        if(orders.isEmpty()) throw  new EntityNotFoundException("No Order found with user uuid %s".formatted(uuid));
+        if (orders.isEmpty()) throw new EntityNotFoundException("No Order found with user uuid %s".formatted(uuid));
 
         orders.forEach(order -> usernameAuthorizationValidator.validate(order.getUsername()));
 
@@ -73,13 +83,33 @@ public class OrderServiceImpl implements OrderService {
 
         usernameAuthorizationValidator.validate(order.getUsername());
 
+        if (order.getOrderDate().plusDays(30).isAfter(LocalDateTime.now()))
+            throw new IllegalStateException("Cancellation date exceeded");
+
+        OrderStatus orderStatus = order.getStatus();
+
+        if (
+                !orderStatus.equals(OrderStatus.PENDING) &&
+                        !orderStatus.equals(OrderStatus.PROCESSING) &&
+                        !orderStatus.equals(OrderStatus.READY)
+        )
+            throw new IllegalStateException("Cancellation is unavailable for this order");
+
         updateOrderStatus(OrderStatus.CANCELLED, order);
-        buildOrderDetailsToCancel(order.getOrderDetails());
+        List<OrderDetail> orderDetailList = buildOrderDetailsToCancel(order.getOrderDetails());
         orderRepository.save(order);
+
+        String topic;
+        if (orderStatus.equals(OrderStatus.PENDING) || orderStatus.equals(OrderStatus.PROCESSING))
+            topic = TopicConstant.INVENTORY_CANCEL_RESERVED_ORDER;
+        else topic = TopicConstant.INVENTORY_CANCEL_ORDER;
+
+        orderDetailList = orderStatus.equals(OrderStatus.PENDING) || orderStatus.equals(OrderStatus.READY) ? orderDetailList : order.getOrderDetails();
+        callProducer(orderDetailList, topic);
     }
 
     @Override
-    public void returnItem(final OrderReturnItemDto orderReturnItemDto) {
+    public void returnItem(final OrderReturnItemDto orderReturnItemDto) throws NoSuchAlgorithmException, InvalidKeyException, JsonProcessingException {
         Order order = orderRepository.findByUuid(orderReturnItemDto.getOrderUuid())
                 .orElseThrow(() -> new EntityNotFoundException("Order with uuid %s not found".formatted(orderReturnItemDto.getOrderUuid())));
 
@@ -89,10 +119,7 @@ public class OrderServiceImpl implements OrderService {
             throw new IllegalStateException("Order cannot be returned");
 
         updateOrderStatus(OrderStatus.RETURN_REQUESTED, order);
-        order.getOrderDetails().add(
-                buildOrderDetailToReturn(orderReturnItemDto, order)
-        );
-
+        buildOrderDetailToReturn(orderReturnItemDto, order);
         orderRepository.save(order);
     }
 
@@ -146,13 +173,13 @@ public class OrderServiceImpl implements OrderService {
                 .build();
     }
 
-    private void buildOrderDetailsToCancel(List<OrderDetail> orderDetails) {
-        orderDetails.addAll(
-                orderDetails
-                        .stream()
-                        .map(buildOrderDetailToCancel())
-                        .toList()
-        );
+    private List<OrderDetail> buildOrderDetailsToCancel(List<OrderDetail> orderDetails) {
+        List<OrderDetail> orderDetailList = orderDetails
+                .stream()
+                .map(buildOrderDetailToCancel())
+                .toList();
+        orderDetails.addAll(orderDetailList);
+        return orderDetailList;
     }
 
     private Function<OrderDetail, OrderDetail> buildOrderDetailToCancel() {
@@ -167,8 +194,8 @@ public class OrderServiceImpl implements OrderService {
                 .build();
     }
 
-    private OrderDetail buildOrderDetailToReturn(OrderReturnItemDto orderReturnItemDto, Order order) {
-        return OrderDetail
+    private void buildOrderDetailToReturn(OrderReturnItemDto orderReturnItemDto, Order order) {
+        OrderDetail orderDetail = OrderDetail
                 .builder()
                 .uuid(UUID.randomUUID().toString())
                 .productUuid(orderReturnItemDto.getProductUuid())
@@ -177,6 +204,7 @@ public class OrderServiceImpl implements OrderService {
                 .unitPrice(orderReturnItemDto.getUnitPrice().subtract(orderReturnItemDto.getUnitPrice().multiply(BigDecimal.valueOf(2))))
                 .order(order)
                 .build();
+        order.getOrderDetails().add(orderDetail);
     }
 
     private OrderDto toDto(Order order) {
@@ -191,15 +219,7 @@ public class OrderServiceImpl implements OrderService {
                 .status(order.getStatus())
                 .orderDetails(order.getOrderDetails()
                         .stream()
-                        .map(orderDetail -> OrderDetailDto
-                                .builder()
-                                .uuid(order.getUuid())
-                                .productUuid(orderDetail.getProductUuid())
-                                .productName(orderDetail.getProductName())
-                                .quantity(orderDetail.getQuantity())
-                                .unitPrice(orderDetail.getUnitPrice())
-                                .orderId(order.getId())
-                                .build())
+                        .map(this::toDto)
                         .toList())
                 .orderStatusHistories(order.getOrderStatusHistories()
                         .stream()
@@ -211,5 +231,33 @@ public class OrderServiceImpl implements OrderService {
                                 .build())
                         .toList())
                 .build();
+    }
+
+    private OrderDetailDto toDto(OrderDetail orderDetail) {
+        return OrderDetailDto
+                .builder()
+                .uuid(orderDetail.getUuid())
+                .productUuid(orderDetail.getProductUuid())
+                .productName(orderDetail.getProductName())
+                .quantity(orderDetail.getQuantity())
+                .unitPrice(orderDetail.getUnitPrice())
+                .orderId(orderDetail.getOrder().getId())
+                .build();
+    }
+
+    private void callProducer(Order order, String topic) {
+        order.getOrderDetails().forEach(orderDetail -> callProducer(orderDetail, topic));
+    }
+
+    private void callProducer(List<OrderDetail> orderDetailList, String topic) {
+        orderDetailList.forEach(orderDetail -> callProducer(orderDetail, topic));
+    }
+
+    private void callProducer(OrderDetail orderDetail, String topic) {
+        try {
+            producer.producer(toDto(orderDetail), "localhost:9092", topic);
+        } catch (JsonProcessingException | NoSuchAlgorithmException | InvalidKeyException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

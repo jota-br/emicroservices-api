@@ -27,10 +27,10 @@ public class ToDto {
                 .uuid(location.getUuid())
                 .name(location.getName())
                 .inventoryId(location.getInventory().getId())
-                .items(location.getItems()
-                        .stream()
-                        .map(ToDto::toDto)
-                        .toList())
+//                .items(location.getItems()
+//                        .stream()
+//                        .map(ToDto::toDto)
+//                        .toList())
                 .build();
     }
 
@@ -38,11 +38,8 @@ public class ToDto {
         return ItemDto
                 .builder()
                 .uuid(item.getUuid())
-                .productUuid(item.getProductUuid())
-                .productName(item.getProductName())
                 .stock(item.getStock())
                 .reserved(item.getReserved())
-                .locationId(item.getLocation().getId())
                 .build();
     }
 }

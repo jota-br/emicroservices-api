@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.github.jotabrc.dto.AddProductDto;
 import io.github.jotabrc.dto.ProductDto;
 import io.github.jotabrc.dto.ProductPriceDto;
-import io.github.jotabrc.ov_kafka_cp.Topic;
+import io.github.jotabrc.ov_kafka_cp.TopicConstant;
 import io.github.jotabrc.ov_kafka_cp.broker.Producer;
 import io.github.jotabrc.response.ResponseBody;
 import io.github.jotabrc.response.ResponsePayload;
@@ -45,7 +45,7 @@ public class ProductController {
                 .fromPath(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/product/uuid/{uuid}")
                 .buildAndExpand(productDto.getUuid())
                 .toUri();
-        producer.producer(productDto, "localhost:9092" , Topic.INVENTORY_ADD_ITEM.getTopic());
+        producer.producer(productDto, "localhost:9092" , TopicConstant.INVENTORY_ADD_ITEM);
         return ResponseEntity.created(location).body(new ResponsePayload<ProductDto>()
                 .setMessage("Product inserted with uuid %s".formatted(productDto.getUuid())));
     }
@@ -82,8 +82,9 @@ public class ProductController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ResponsePayload<ProductDto>> update(@RequestBody final ProductDto productDto) {
+    public ResponseEntity<ResponsePayload<ProductDto>> update(@RequestBody final ProductDto productDto) throws NoSuchAlgorithmException, InvalidKeyException, JsonProcessingException {
         productService.update(productDto);
+        producer.producer(productDto, "localhost:9092" , TopicConstant.INVENTORY_UPDATE_NAME);
         return ResponseEntity
                 .ok(
                         new ResponsePayload<ProductDto>()

@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 
-import java.util.List;
-
 @Accessors(chain = true)
 @Setter
 @Getter
@@ -27,8 +25,8 @@ public class Location {
     @JoinColumn(name = "inventory_id", nullable = false)
     private Inventory inventory;
 
-    @OneToMany(mappedBy = "location", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Item> items;
+//    @OneToMany(mappedBy = "location", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<Item> items;
 
     @Version
     private int version;
