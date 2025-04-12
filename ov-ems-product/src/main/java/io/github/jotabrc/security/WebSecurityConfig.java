@@ -11,6 +11,8 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import static io.github.jotabrc.controller.ControllerDefaults.MAPPING_PREFIX;
 import static io.github.jotabrc.controller.ControllerDefaults.MAPPING_VERSION_SUFFIX;
@@ -20,13 +22,16 @@ import static io.github.jotabrc.controller.ControllerDefaults.MAPPING_VERSION_SU
 public class WebSecurityConfig {
 
     private static final String[] SWAGGER_WHITELIST = {
+            "/v3/api-docs-product/**",
             "/v3/api-docs/**",
             "/swagger-resources",
             "/swagger-resources/**",
             "/configuration/ui",
             "/configuration/security",
-            "/swagger-ui.html",
+            "/swagger-product.html",
+            "/swagger-product/**",
             "/swagger-ui/**",
+            "/swagger-ui.html",
             "/webjars/**"
     };
 
@@ -56,5 +61,20 @@ public class WebSecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 );
         return http.build();
+    }
+
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedOrigins("http://localhost:8080")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowedHeaders("Authorization", "Content-Type")
+                        .exposedHeaders("Authorization")
+                        .allowCredentials(true);
+            }
+        };
     }
 }

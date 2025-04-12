@@ -21,3 +21,14 @@ spring:
       settings:
         trace: false
         web-allow-others: false
+
+exception:
+  message:
+    role: User authorization denied
+    username: User authorization denied
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs-order
+  swagger-ui:
+    path: /swagger-order

@@ -13,3 +13,9 @@ exception:
   message:
     role: User authorization denied
     username: User authorization denied
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs-product
+  swagger-ui:
+    path: /swagger-product

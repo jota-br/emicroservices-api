@@ -34,12 +34,20 @@ public class GatewayConfig implements WebFluxConfigurer {
 
     private static final String[] SWAGGER_WHITELIST = {
             "/v3/api-docs/**",
+            "/v3/api-docs-user/**",
+            "/v3/api-docs-product/**",
+            "/v3/api-docs-order/**",
+            "/v3/api-docs-inventory/**",
             "/swagger-resources",
             "/swagger-resources/**",
             "/configuration/ui",
             "/configuration/security",
             "/swagger-ui.html",
             "/swagger-ui/**",
+            "/swagger-user/**",
+            "/swagger-product/**",
+            "/swagger-order/**",
+            "/swagger-inventory/**",
             "/webjars/**"
     };
 
@@ -57,24 +65,38 @@ public class GatewayConfig implements WebFluxConfigurer {
                         .filters(f -> f
                                 .rewritePath(serviceConfig.getUserServiceH2Pattern(), serviceConfig.getUserServiceH2Replacement())
                         )
-                        .uri(serviceConfig.getUserServiceH2Uri()))
+                        .uri(serviceConfig.getUserServiceUri()))
 
-                .route(serviceConfig.getUserServiceSwaggerName(), r -> r.path(SWAGGER_WHITELIST)
+                .route(serviceConfig.getUserServiceSwaggerName(), r -> r.path("/swagger-user/**")
                         .filters(f -> f
                                 .rewritePath(serviceConfig.getUserServiceSwaggerPattern(), serviceConfig.getUserServiceSwaggerReplacement())
                         )
-                        .uri(serviceConfig.getUserServiceSwaggerUri()))
+                        .uri(serviceConfig.getUserServiceUri()))
+
+                .route(serviceConfig.getUserServiceSwaggerApiDocsName(), r -> r.path("/v3/api-docs-user/**")
+                        .filters(f -> f.rewritePath(serviceConfig.getUserServiceSwaggerApiDocsPattern(), serviceConfig.getUserServiceSwaggerApiDocsReplacement()))
+                        .uri(serviceConfig.getUserServiceUri()))
 
                 .route(serviceConfig.getUserActivationServiceName(), r -> r.path("/activation-token/**")
                         .filters(f -> f
                                 .rewritePath(serviceConfig.getUserActivationServicePattern(), serviceConfig.getUserActivationServiceReplacement())
                         )
-                        .uri(serviceConfig.getUserActivationServiceUri()))
+                        .uri(serviceConfig.getUserServiceUri()))
 
                 .route(serviceConfig.getInventoryServiceName(), r -> r.path("/inventory/**")
                         .filters(f -> f
                                 .rewritePath(serviceConfig.getInventoryServicePattern(), serviceConfig.getInventoryServiceReplacement())
                         )
+                        .uri(serviceConfig.getInventoryServiceUri()))
+
+                .route(serviceConfig.getInventoryServiceSwaggerName(), r -> r.path("/swagger-inventory/**")
+                        .filters(f -> f
+                                .rewritePath(serviceConfig.getInventoryServiceSwaggerPattern(), serviceConfig.getInventoryServiceSwaggerReplacement())
+                        )
+                        .uri(serviceConfig.getInventoryServiceUri()))
+
+                .route(serviceConfig.getInventoryServiceSwaggerApiDocsName(), r -> r.path("/v3/api-docs-inventory/**")
+                        .filters(f -> f.rewritePath(serviceConfig.getInventoryServiceSwaggerApiDocsPattern(), serviceConfig.getInventoryServiceSwaggerApiDocsReplacement()))
                         .uri(serviceConfig.getInventoryServiceUri()))
 
                 .route(serviceConfig.getOrderServiceName(), r -> r.path("/order/**")
@@ -83,10 +105,30 @@ public class GatewayConfig implements WebFluxConfigurer {
                         )
                         .uri(serviceConfig.getOrderServiceUri()))
 
+                .route(serviceConfig.getOrderServiceSwaggerName(), r -> r.path("/swagger-order/**")
+                        .filters(f -> f
+                                .rewritePath(serviceConfig.getOrderServiceSwaggerPattern(), serviceConfig.getOrderServiceSwaggerReplacement())
+                        )
+                        .uri(serviceConfig.getOrderServiceUri()))
+
+                .route(serviceConfig.getOrderServiceSwaggerApiDocsName(), r -> r.path("/v3/api-docs-order/**")
+                        .filters(f -> f.rewritePath(serviceConfig.getOrderServiceSwaggerApiDocsPattern(), serviceConfig.getOrderServiceSwaggerApiDocsReplacement()))
+                        .uri(serviceConfig.getOrderServiceUri()))
+
                 .route(serviceConfig.getProductServiceName(), r -> r.path("/product/**")
                         .filters(f -> f
                                 .rewritePath(serviceConfig.getProductServicePattern(), serviceConfig.getProductServiceReplacement())
                         )
+                        .uri(serviceConfig.getProductServiceUri()))
+
+                .route(serviceConfig.getProductServiceSwaggerName(), r -> r.path("/swagger-product/**")
+                        .filters(f -> f
+                                .rewritePath(serviceConfig.getProductServiceSwaggerPattern(), serviceConfig.getProductServiceSwaggerReplacement())
+                        )
+                        .uri(serviceConfig.getProductServiceUri()))
+
+                .route(serviceConfig.getProductServiceSwaggerApiDocsName(), r -> r.path("/v3/api-docs-product/**")
+                        .filters(f -> f.rewritePath(serviceConfig.getProductServiceSwaggerApiDocsPattern(), serviceConfig.getProductServiceSwaggerApiDocsReplacement()))
                         .uri(serviceConfig.getProductServiceUri()))
                 .build();
     }

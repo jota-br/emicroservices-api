@@ -60,13 +60,13 @@ public class ItemController {
     public ResponseEntity<ResponsePayload<InventoryDto>> updateName(@RequestBody final UpdateProductNameDto updateProductNameDto) {
         itemService.updateName(updateProductNameDto);
         return ResponseEntity.ok(new ResponsePayload<InventoryDto>()
-                .setMessage("Item with uuid %s name has been updated".formatted(updateProductNameDto.getProductUuid())));
+                .setMessage("Item with uuid %s name has been updated".formatted(updateProductNameDto.getUuid())));
     }
 
     @PutMapping("/update/reserve")
     public ResponseEntity<ResponsePayload<InventoryDto>> updateReserve(@RequestBody final UpdateProductNameDto updateProductNameDto) {
         itemService.updateName(updateProductNameDto);
         return ResponseEntity.ok(new ResponsePayload<InventoryDto>()
-                .setMessage("Item with uuid %s reserve has been updated".formatted(updateProductNameDto.getProductUuid())));
+                .setMessage("Item with uuid %s reserve has been updated".formatted(updateProductNameDto.getUuid())));
     }
 }

@@ -80,7 +80,7 @@
 		<dependency>
 			<groupId>io.github.jotabrc</groupId>
 			<artifactId>ov-auth</artifactId>
-			<version>3.1.1</version>
+			<version>3.1.4</version>
 		</dependency>
 		<dependency>
 			<groupId>io.github.jotabrc</groupId>
