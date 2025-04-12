@@ -11,9 +11,10 @@ RESTful API for adding and retrieving products, placing orders and authenticate 
 - ``Spring Security`` with ``JWT``;
 - Cache with ``Redis``;
 - Using shared libraries:
-    - [`ov-auth`](https://github.com/jotabrc/ov-auth) for Spring WEB (MVC) Token Creation and Authentication.
+    - [`ov-auth`](https://github.com/jotabrc/ov-auth) for Token Creation and Authentication.
     - [`ov-annotation-validator`](https://github.com/jotabrc/ov-annotation-validator) for user input validation.
-    - [`ov-sanitizer`](https://github.com/jotabrc/ov-sanitizer) for user input sanitization.
+    - [`ov-auth-validator`](https://github.com/jotabrc/ov-auth-validator) for user authorization validation.
+    - [`ov-kafka-cp`](https://github.com/jotabrc/ov-kafka-cp) for Kafka configuration and standardized Producer.
 
 ### Status
 
@@ -47,5 +48,5 @@ RESTful API for adding and retrieving products, placing orders and authenticate 
     - [X] Login
     - [x] Validation
 - Kafka
-    - [ ] Consumers
-    - [ ] Producers
+    - [X] Consumers
+    - [X] Producers
