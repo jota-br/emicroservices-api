@@ -1,11 +1,11 @@
 # demo e-Commerce Microservices API
 
-RESTful API for adding and retrieving products, placing orders and authenticate route access.
+RESTful API for adding and retrieving products, placing orders and authenticated route access management.
 
 ### Structure
 
 - API Gateway using ``Spring Cloud Gateway``;
-- Microservices for managing products, orders, inventory and user registration and auth;
+- Microservices for managing products, orders, inventory, user registration and auth;
 - ``MongoDB``: ``Product``;
 - ``PostgreSQL``: ``Order``, ``User`` and ``Inventory``;
 - ``Spring Security`` with ``JWT``;
@@ -21,24 +21,28 @@ RESTful API for adding and retrieving products, placing orders and authenticate 
 - API Gateway
     - [ ] Security
     - [ ] Cache
+    - [ ] Tests
 - Product
     - [x] Controller
     - [x] ExceptionHandler
     - [x] Service
     - [x] Repository
     - [x] Validation
+    - [ ] Tests
 - Order
     - [x] Controller
     - [x] ExceptionHandler
     - [x] Service
     - [x] Repository
     - [x] Validation
+    - [ ] Tests
 - Inventory
     - [x] Controller
     - [x] ExceptionHandler
     - [x] Service
     - [x] Repository
     - [x] Validation
+    - [ ] Tests
 - User
     - [x] Controller
     - [x] ExceptionHandler
@@ -47,6 +51,8 @@ RESTful API for adding and retrieving products, placing orders and authenticate 
     - [X] JWT
     - [X] Login
     - [x] Validation
+    - [ ] Tests
 - Kafka
     - [X] Consumers
     - [X] Producers
+    - [ ] Tests
