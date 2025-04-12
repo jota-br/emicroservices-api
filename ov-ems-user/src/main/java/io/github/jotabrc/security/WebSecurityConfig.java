@@ -21,7 +21,7 @@ import static io.github.jotabrc.controller.ControllerDefaults.MAPPING_VERSION_SU
 @EnableWebSecurity
 public class WebSecurityConfig {
 
-    private static final String[] SWAGGER_WHITELIST = {
+    private static final String[] WHITELIST = {
             "/v3/api-docs-user/**",
             "/v3/api-docs/**",
             "/swagger-resources",
@@ -32,7 +32,9 @@ public class WebSecurityConfig {
             "/swagger-user/**",
             "/swagger-ui/**",
             "/swagger-ui.html",
-            "/webjars/**"
+            "/webjars/**",
+            "/h2-console-user/**",
+            "/login.do"
     };
 
     @Bean
@@ -41,8 +43,7 @@ public class WebSecurityConfig {
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(SWAGGER_WHITELIST).permitAll()
-                        .requestMatchers("/h2-console/**").permitAll()
+                        .requestMatchers(WHITELIST).permitAll()
 
                         .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/user/login").permitAll()
                         .requestMatchers(MAPPING_PREFIX + MAPPING_VERSION_SUFFIX + "/user/register").permitAll()

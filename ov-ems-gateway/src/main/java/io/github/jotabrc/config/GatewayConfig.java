@@ -32,7 +32,7 @@ public class GatewayConfig implements WebFluxConfigurer {
     @Autowired
     private ServiceConfiguration serviceConfig;
 
-    private static final String[] SWAGGER_WHITELIST = {
+    private static final String[] WHITELIST = {
             "/v3/api-docs/**",
             "/v3/api-docs-user/**",
             "/v3/api-docs-product/**",
@@ -48,7 +48,15 @@ public class GatewayConfig implements WebFluxConfigurer {
             "/swagger-product/**",
             "/swagger-order/**",
             "/swagger-inventory/**",
-            "/webjars/**"
+            "/webjars/**",
+            "/h2-console-order",
+            "/h2-console-order/**",
+            "/h2-console-inventory",
+            "/h2-console-inventory/**",
+            "/h2-console-user",
+            "/h2-console-user/**",
+            "/h2-console",
+            "/login.do"
     };
 
     @Bean
@@ -61,7 +69,7 @@ public class GatewayConfig implements WebFluxConfigurer {
                         )
                         .uri(serviceConfig.getUserServiceUri()))
 
-                .route(serviceConfig.getUserServiceH2Name(), r -> r.path("/h2-console/**")
+                .route(serviceConfig.getUserServiceH2Name(), r -> r.path("/h2-console-user/**")
                         .filters(f -> f
                                 .rewritePath(serviceConfig.getUserServiceH2Pattern(), serviceConfig.getUserServiceH2Replacement())
                         )
@@ -89,6 +97,12 @@ public class GatewayConfig implements WebFluxConfigurer {
                         )
                         .uri(serviceConfig.getInventoryServiceUri()))
 
+                .route(serviceConfig.getInventoryServiceH2Name(), r -> r.path("/h2-console-inventory/**")
+                        .filters(f -> f
+                                .rewritePath(serviceConfig.getInventoryServiceH2Pattern(), serviceConfig.getInventoryServiceH2Replacement())
+                        )
+                        .uri(serviceConfig.getInventoryServiceUri()))
+
                 .route(serviceConfig.getInventoryServiceSwaggerName(), r -> r.path("/swagger-inventory/**")
                         .filters(f -> f
                                 .rewritePath(serviceConfig.getInventoryServiceSwaggerPattern(), serviceConfig.getInventoryServiceSwaggerReplacement())
@@ -102,6 +116,12 @@ public class GatewayConfig implements WebFluxConfigurer {
                 .route(serviceConfig.getOrderServiceName(), r -> r.path("/order/**")
                         .filters(f -> f
                                 .rewritePath(serviceConfig.getOrderServicePattern(), serviceConfig.getOrderServiceReplacement())
+                        )
+                        .uri(serviceConfig.getOrderServiceUri()))
+
+                .route(serviceConfig.getOrderServiceH2Name(), r -> r.path("/h2-console-order/**")
+                        .filters(f -> f
+                                .rewritePath(serviceConfig.getOrderServiceH2Pattern(), serviceConfig.getOrderServiceH2Replacement())
                         )
                         .uri(serviceConfig.getOrderServiceUri()))
 
@@ -138,9 +158,8 @@ public class GatewayConfig implements WebFluxConfigurer {
         http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(auth -> auth
+                        .pathMatchers(WHITELIST).permitAll()
                         // User API
-                        .pathMatchers("/h2-console").permitAll()
-                        .pathMatchers(SWAGGER_WHITELIST).permitAll()
                         .pathMatchers("/user/login").permitAll()
                         .pathMatchers("/user/register").permitAll()
                         .pathMatchers("/activation-token/activate/**").permitAll()

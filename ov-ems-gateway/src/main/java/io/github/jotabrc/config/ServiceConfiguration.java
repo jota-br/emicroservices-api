@@ -44,6 +44,11 @@ public class ServiceConfiguration {
     private String inventoryServicePattern;
     private String inventoryServiceReplacement;
 
+    // == INVENTORY H2 ==
+    private String inventoryServiceH2Name;
+    private String inventoryServiceH2Pattern;
+    private String inventoryServiceH2Replacement;
+
     // == INVENTORY SWAGGER ==
     private String inventoryServiceSwaggerName;
     private String inventoryServiceSwaggerPattern;
@@ -58,6 +63,11 @@ public class ServiceConfiguration {
     private String orderServiceUri;
     private String orderServicePattern;
     private String orderServiceReplacement;
+
+    // == ORDER H2 ==
+    private String orderServiceH2Name;
+    private String orderServiceH2Pattern;
+    private String orderServiceH2Replacement;
 
     // == ORDER SWAGGER ==
     private String orderServiceSwaggerName;
