@@ -1,11 +1,14 @@
 package io.github.jotabrc.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.github.jotabrc.document.Category;
 import io.github.jotabrc.document.Image;
 import io.github.jotabrc.document.Product;
 import io.github.jotabrc.dto.*;
 import io.github.jotabrc.handler.DocumentAlreadyExistsException;
 import io.github.jotabrc.handler.DocumentNotFoundException;
+import io.github.jotabrc.ov_kafka_cp.TopicConstant;
+import io.github.jotabrc.ov_kafka_cp.broker.Producer;
 import io.github.jotabrc.repository.ProductRepository;
 import io.github.jotabrc.util.sanitization.ProductSanitizer;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -15,6 +18,8 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,11 +30,13 @@ public class ProductServiceImpl implements ProductService {
     private final ProductSanitizer productSanitizer;
     private final ProductRepository productRepository;
     private final MongoTemplate mongoTemplate;
+    private final Producer producer;
 
-    public ProductServiceImpl(ProductSanitizer productSanitizer, ProductRepository productRepository, MongoTemplate mongoTemplate) {
+    public ProductServiceImpl(ProductSanitizer productSanitizer, ProductRepository productRepository, MongoTemplate mongoTemplate, Producer producer) {
         this.productSanitizer = productSanitizer;
         this.productRepository = productRepository;
         this.mongoTemplate = mongoTemplate;
+        this.producer = producer;
     }
 
     @Override
@@ -56,7 +63,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDto add(final AddProductDto addProductDto) {
+    public String add(final AddProductDto addProductDto) throws NoSuchAlgorithmException, InvalidKeyException, JsonProcessingException {
         boolean productExists = productRepository.findByName(addProductDto.getName())
                 .isPresent();
 
@@ -65,19 +72,23 @@ public class ProductServiceImpl implements ProductService {
 
         Product product = build(addProductDto);
         productSanitizer.sanitize(product);
-        return toDto(productRepository.save(product));
+        product = productRepository.save(product);
+        ProductDto productDto = toDto(product);
+        producer.producer(productDto, "localhost:9092", TopicConstant.INVENTORY_ADD_ITEM);
+        return productDto.getUuid();
     }
 
     @Override
-    public void update(final ProductDto productDto) {
-        boolean exists = productRepository.existsByUuid(productDto.getUuid());
-
-        if (!exists)
-            throw new DocumentNotFoundException("Product with uuid %s not found".formatted(productDto.getUuid()));
+    public void update(final ProductDto productDto) throws NoSuchAlgorithmException, InvalidKeyException, JsonProcessingException {
+        Product product = productRepository.findByUuid(productDto.getUuid())
+                .orElseThrow(() -> new DocumentNotFoundException("Product with uuid %s not found"
+                        .formatted(productDto.getUuid())));
 
         QueryAndUpdate queryAndUpdate = getQueryAndUpdate(productDto);
 
         mongoTemplate.updateFirst(queryAndUpdate.query(), queryAndUpdate.update(), Product.class);
+        if (!productDto.getName().equals(product.getName())) producer
+                .producer(productDto, "localhost:9092", TopicConstant.INVENTORY_UPDATE_NAME);
     }
 
     @Override

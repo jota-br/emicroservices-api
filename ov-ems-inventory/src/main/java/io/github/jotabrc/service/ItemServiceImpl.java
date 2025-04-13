@@ -1,10 +1,9 @@
 package io.github.jotabrc.service;
 
-import io.github.jotabrc.dto.AddItemDto;
-import io.github.jotabrc.dto.ItemDto;
-import io.github.jotabrc.dto.UpdateProductNameDto;
-import io.github.jotabrc.dto.UpdateProductStockDto;
+import io.github.jotabrc.dto.*;
 import io.github.jotabrc.model.Item;
+import io.github.jotabrc.ov_kafka_cp.TopicConstant;
+import io.github.jotabrc.ov_kafka_cp.broker.Producer;
 import io.github.jotabrc.repository.ItemRepository;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
@@ -17,10 +16,12 @@ import static io.github.jotabrc.util.ToDto.toDto;
 public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
+    private final Producer producer;
 
     @Autowired
-    public ItemServiceImpl(ItemRepository itemRepository) {
+    public ItemServiceImpl(ItemRepository itemRepository, Producer producer) {
         this.itemRepository = itemRepository;
+        this.producer = producer;
     }
 
     @Override
@@ -65,14 +66,25 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public void updateReserve(final UpdateProductStockDto updateProductStockDto) {
+    public void updateReserve(AddOrderDto addOrderDto) {
+        UpdateProductStockDto updateProductStockDto = buildUpdateProductStockDto(addOrderDto);
+        boolean result = updateReserve(updateProductStockDto);
+        if (!result)
+            producer.producer(addOrderDto.getOrderUuid(), "localhost:9092", TopicConstant.ORDER_CANCEL);
+    }
+
+    @Override
+    public boolean updateReserve(final UpdateProductStockDto updateProductStockDto) {
         Item item = itemRepository
                 .findByUuid(updateProductStockDto.getProductUuid())
                 .orElseThrow(() -> new EntityNotFoundException("Product with uuid %s not found"
                         .formatted(updateProductStockDto.getProductUuid())));
 
-        item.setStock(item.getReserved() + updateProductStockDto.getQuantity());
+        if (item.getStock() < item.getReserved() + updateProductStockDto.getQuantity()) return false;
+
+        item.setReserved(item.getReserved() + updateProductStockDto.getQuantity());
         itemRepository.save(item);
+        return true;
     }
 
     private Item build(final AddItemDto addItemDto) {
@@ -80,6 +92,14 @@ public class ItemServiceImpl implements ItemService {
                 .builder()
                 .uuid(addItemDto.getUuid())
                 .name(addItemDto.getName())
+                .build();
+    }
+
+    private UpdateProductStockDto buildUpdateProductStockDto(AddOrderDto addOrderDto) {
+        return UpdateProductStockDto
+                .builder()
+                .productUuid(addOrderDto.getProductUuid())
+                .quantity(addOrderDto.getQuantity())
                 .build();
     }
 }

@@ -40,7 +40,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = build(orderCreationDto);
         order = orderRepository.save(order);
 
-        callProducer(order, TopicConstant.INVENTORY_ADD_ITEM);
+        callProducer(order, TopicConstant.INVENTORY_ADD_ORDER);
         return order.getUuid();
     }
 
@@ -99,12 +99,8 @@ public class OrderServiceImpl implements OrderService {
         List<OrderDetail> orderDetailList = buildOrderDetailsToCancel(order.getOrderDetails());
         orderRepository.save(order);
 
-        String topic;
-        if (orderStatus.equals(OrderStatus.PENDING) || orderStatus.equals(OrderStatus.PROCESSING))
-            topic = TopicConstant.INVENTORY_CANCEL_RESERVED_ORDER;
-        else topic = TopicConstant.INVENTORY_CANCEL_ORDER;
-
-        orderDetailList = orderStatus.equals(OrderStatus.PENDING) || orderStatus.equals(OrderStatus.READY) ? orderDetailList : order.getOrderDetails();
+        String topic = getTopic(orderStatus);
+        orderDetailList = getDetailList(orderDetailList, orderStatus, order);
         callProducer(orderDetailList, topic);
     }
 
@@ -243,6 +239,19 @@ public class OrderServiceImpl implements OrderService {
                 .unitPrice(orderDetail.getUnitPrice())
                 .orderId(orderDetail.getOrder().getId())
                 .build();
+    }
+
+    private List<OrderDetail> getDetailList(List<OrderDetail> orderDetailList, OrderStatus orderStatus, Order order) {
+        orderDetailList = orderStatus.equals(OrderStatus.PENDING) || orderStatus.equals(OrderStatus.READY) ? orderDetailList : order.getOrderDetails();
+        return orderDetailList;
+    }
+
+    private String getTopic(OrderStatus orderStatus) {
+        String topic;
+        if (orderStatus.equals(OrderStatus.PENDING) || orderStatus.equals(OrderStatus.PROCESSING))
+            topic = TopicConstant.INVENTORY_CANCEL_RESERVED_ORDER;
+        else topic = TopicConstant.INVENTORY_CANCEL_ORDER;
+        return topic;
     }
 
     private void callProducer(Order order, String topic) {

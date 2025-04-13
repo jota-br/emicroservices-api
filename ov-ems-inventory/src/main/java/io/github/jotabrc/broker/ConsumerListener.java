@@ -3,9 +3,11 @@ package io.github.jotabrc.broker;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.jotabrc.dto.AddItemDto;
+import io.github.jotabrc.dto.AddOrderDto;
 import io.github.jotabrc.dto.UpdateProductNameDto;
 import io.github.jotabrc.dto.UpdateProductStockDto;
 import io.github.jotabrc.ov_kafka_cp.TopicConstant;
+import io.github.jotabrc.ov_kafka_cp.broker.Producer;
 import io.github.jotabrc.ovauth.header.Header;
 import io.github.jotabrc.ovauth.token.SecurityHeader;
 import io.github.jotabrc.service.ItemService;
@@ -21,10 +23,12 @@ import java.security.NoSuchAlgorithmException;
 public class ConsumerListener {
 
     private final ItemService itemService;
+    private final Producer producer;
 
     @Autowired
-    public ConsumerListener(ItemService itemService) {
+    public ConsumerListener(ItemService itemService, Producer producer) {
         this.itemService = itemService;
+        this.producer = producer;
     }
 
     @KafkaListener(topics = TopicConstant.INVENTORY_ADD_ITEM + "," +
@@ -56,8 +60,8 @@ public class ConsumerListener {
                     itemService.updateName(updateProductNameDto);
                 }
                 case TopicConstant.INVENTORY_ADD_ORDER, TopicConstant.INVENTORY_CANCEL_RESERVED_ORDER -> {
-                    UpdateProductStockDto updateProductStockDto = objectMapper.readValue(record.value(), UpdateProductStockDto.class);
-                    itemService.updateReserve(updateProductStockDto);
+                    AddOrderDto addOrderDto = objectMapper.readValue(record.value(), AddOrderDto.class);
+                    itemService.updateReserve(addOrderDto);
                 }
                 case TopicConstant.INVENTORY_CANCEL_ORDER -> {
                     UpdateProductStockDto updateProductStockDto = objectMapper.readValue(record.value(), UpdateProductStockDto.class);
