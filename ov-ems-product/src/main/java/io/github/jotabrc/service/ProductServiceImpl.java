@@ -7,6 +7,7 @@ import io.github.jotabrc.document.Product;
 import io.github.jotabrc.dto.*;
 import io.github.jotabrc.handler.DocumentAlreadyExistsException;
 import io.github.jotabrc.handler.DocumentNotFoundException;
+import io.github.jotabrc.ov_kafka_cp.ServerConstant;
 import io.github.jotabrc.ov_kafka_cp.TopicConstant;
 import io.github.jotabrc.ov_kafka_cp.broker.Producer;
 import io.github.jotabrc.repository.ProductRepository;
@@ -74,7 +75,7 @@ public class ProductServiceImpl implements ProductService {
         productSanitizer.sanitize(product);
         product = productRepository.save(product);
         ProductDto productDto = toDto(product);
-        producer.producer(productDto, "localhost:9092", TopicConstant.INVENTORY_ADD_ITEM);
+        producer.producer(productDto, ServerConstant.SERVERS, TopicConstant.INVENTORY_ADD_ITEM);
         return productDto.getUuid();
     }
 
@@ -88,7 +89,7 @@ public class ProductServiceImpl implements ProductService {
 
         mongoTemplate.updateFirst(queryAndUpdate.query(), queryAndUpdate.update(), Product.class);
         if (!productDto.getName().equals(product.getName())) producer
-                .producer(productDto, "localhost:9092", TopicConstant.INVENTORY_UPDATE_NAME);
+                .producer(productDto, ServerConstant.SERVERS, TopicConstant.INVENTORY_UPDATE_NAME);
     }
 
     @Override

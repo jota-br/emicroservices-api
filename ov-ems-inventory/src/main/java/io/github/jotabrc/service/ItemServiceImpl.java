@@ -1,7 +1,9 @@
 package io.github.jotabrc.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.github.jotabrc.dto.*;
 import io.github.jotabrc.model.Item;
+import io.github.jotabrc.ov_kafka_cp.ServerConstant;
 import io.github.jotabrc.ov_kafka_cp.TopicConstant;
 import io.github.jotabrc.ov_kafka_cp.broker.Producer;
 import io.github.jotabrc.repository.ItemRepository;
@@ -9,6 +11,9 @@ import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
 import static io.github.jotabrc.util.ToDto.toDto;
 
@@ -66,11 +71,11 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public void updateReserve(AddOrderDto addOrderDto) {
+    public void updateReserve(AddOrderDto addOrderDto) throws NoSuchAlgorithmException, InvalidKeyException, JsonProcessingException {
         UpdateProductStockDto updateProductStockDto = buildUpdateProductStockDto(addOrderDto);
         boolean result = updateReserve(updateProductStockDto);
         if (!result)
-            producer.producer(addOrderDto.getOrderUuid(), "localhost:9092", TopicConstant.ORDER_CANCEL);
+            producer.producer(addOrderDto.getOrderUuid(), ServerConstant.SERVERS, TopicConstant.ORDER_CANCEL);
     }
 
     @Override

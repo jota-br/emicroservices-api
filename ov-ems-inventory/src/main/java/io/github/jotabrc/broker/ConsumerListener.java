@@ -68,7 +68,7 @@ public class ConsumerListener {
                     itemService.updateStock(updateProductStockDto);
                 }
             }
-        } catch (JsonProcessingException e) {
+        } catch (JsonProcessingException | NoSuchAlgorithmException | InvalidKeyException e) {
             throw new RuntimeException(e);
         }
     }

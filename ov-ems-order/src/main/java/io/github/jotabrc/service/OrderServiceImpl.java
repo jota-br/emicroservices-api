@@ -7,6 +7,7 @@ import io.github.jotabrc.model.OrderDetail;
 import io.github.jotabrc.model.OrderStatus;
 import io.github.jotabrc.model.OrderStatusHistory;
 import io.github.jotabrc.ov_auth_validator.authorization.UsernameAuthorizationValidator;
+import io.github.jotabrc.ov_kafka_cp.ServerConstant;
 import io.github.jotabrc.ov_kafka_cp.TopicConstant;
 import io.github.jotabrc.ov_kafka_cp.broker.Producer;
 import io.github.jotabrc.repository.OrderRepository;
@@ -264,7 +265,7 @@ public class OrderServiceImpl implements OrderService {
 
     private void callProducer(OrderDetail orderDetail, String topic) {
         try {
-            producer.producer(toDto(orderDetail), "localhost:9092", topic);
+            producer.producer(toDto(orderDetail), ServerConstant.SERVERS, topic);
         } catch (JsonProcessingException | NoSuchAlgorithmException | InvalidKeyException e) {
             throw new RuntimeException(e);
         }
