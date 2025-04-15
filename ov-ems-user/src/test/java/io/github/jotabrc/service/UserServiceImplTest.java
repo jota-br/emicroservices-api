@@ -9,7 +9,8 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.security.NoSuchAlgorithmException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @ActiveProfiles("dev")
@@ -42,10 +43,6 @@ class UserServiceImplTest {
                 .phone("+5511123456789")
                 .build();
         assertNotNull(userService.add(addUserDto));
-    }
-
-    @Test
-    void update() {
     }
 
     @Test
