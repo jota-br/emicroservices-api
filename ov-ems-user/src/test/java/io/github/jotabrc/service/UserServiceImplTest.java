@@ -54,6 +54,10 @@ class UserServiceImplTest {
     }
 
     @Test
+    void update() throws NoSuchAlgorithmException {
+    }
+
+    @Test
     void getUserByUuid() {
     }
 
