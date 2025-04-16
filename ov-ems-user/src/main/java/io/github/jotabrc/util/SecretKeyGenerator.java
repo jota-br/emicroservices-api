@@ -1,15 +1,14 @@
 package io.github.jotabrc.util;
 
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.Jwts;
 
 import java.security.Key;
 import java.util.Base64;
 
 public class SecretKeyGenerator {
 
-    public static void main(String[] args) {
-        Key key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
-        System.out.println(Base64.getEncoder().encodeToString(key.getEncoded()));
+    public static String getKey() {
+        Key key = Jwts.SIG.HS512.key().build();
+        return Base64.getEncoder().encodeToString(key.getEncoded());
     }
 }
