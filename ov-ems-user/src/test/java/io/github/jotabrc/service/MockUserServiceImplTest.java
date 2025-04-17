@@ -188,10 +188,11 @@ class MockUserServiceImplTest {
                 .build();
 
         try (MockedStatic<TokenCreator> mockedStatic = mockStatic(TokenCreator.class)) {
-            mockedStatic.when(() -> TokenCreator.create(eq("Bearer"), eq("key"), any(TokenObject.class)))
+            mockedStatic.when(() -> TokenCreator.create(any(), any(), any(TokenObject.class)))
                     .thenReturn("token-mock");
             var result = userService.login(loginDto);
             assert result.getUser().equals(loginDto.getUsername());
+            assert result.getToken().equals("token-mock");
         }
     }
 
