@@ -1,6 +1,8 @@
 package io.github.jotabrc.config;
 
 import io.github.jotabrc.ov_auth_validator.util.UserRoles;
+import io.github.jotabrc.service.RedisCacheFilterConfig;
+import io.github.jotabrc.service.RedisCacheFilterFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
@@ -31,6 +33,12 @@ public class GatewayConfig implements WebFluxConfigurer {
 
     @Autowired
     private ServiceConfiguration serviceConfig;
+
+    @Autowired
+    private RedisCacheFilterFactory redisCacheFilterFactory;
+
+    @Autowired
+    private RedisCacheFilterConfig redisCacheFilterConfig;
 
     private static final String[] WHITELIST = {
             "/v3/api-docs/**",
@@ -66,6 +74,7 @@ public class GatewayConfig implements WebFluxConfigurer {
                 .route(serviceConfig.getUserServiceName(), r -> r.path("/user/**")
                         .filters(f -> f
                                 .rewritePath(serviceConfig.getUserServicePattern(), serviceConfig.getUserServiceReplacement())
+                                .filter(redisCacheFilterFactory.apply(redisCacheFilterConfig))
                         )
                         .uri(serviceConfig.getUserServiceUri()))
 
