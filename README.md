@@ -17,32 +17,30 @@ RESTful API for adding and retrieving products, placing orders and authenticated
     - [`ov-kafka-cp`](https://github.com/jotabrc/ov-kafka-cp) for Kafka configuration and standardized Producer.
 
 ### Status
+- [x] Mockito and JUnit tests.
+
 
 - API Gateway
     - [ ] Security
     - [ ] Cache
-    - [ ] Tests
 - Product
     - [x] Controller
     - [x] ExceptionHandler
     - [x] Service
     - [x] Repository
     - [x] Validation
-    - [ ] Tests
 - Order
     - [x] Controller
     - [x] ExceptionHandler
     - [x] Service
     - [x] Repository
     - [x] Validation
-    - [ ] Tests
 - Inventory
     - [x] Controller
     - [x] ExceptionHandler
     - [x] Service
     - [x] Repository
     - [x] Validation
-    - [ ] Tests
 - User
     - [x] Controller
     - [x] ExceptionHandler
@@ -51,7 +49,6 @@ RESTful API for adding and retrieving products, placing orders and authenticated
     - [X] JWT
     - [X] Login
     - [x] Validation
-    - [ ] Tests
 - Kafka
     - [X] Consumers
     - [X] Producers
