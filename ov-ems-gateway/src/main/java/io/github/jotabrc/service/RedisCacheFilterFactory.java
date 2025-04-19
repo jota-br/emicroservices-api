@@ -1,5 +1,6 @@
 package io.github.jotabrc.service;
 
+import io.github.jotabrc.config.ServiceConfiguration;
 import io.github.jotabrc.model.Cache;
 import io.github.jotabrc.security.SecurityHeader;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,20 +21,25 @@ public class RedisCacheFilterFactory extends AbstractGatewayFilterFactory<RedisC
 
     private final CacheService cacheService;
     private final WebClient.Builder webClientBuilder;
+    private final ServiceConfiguration serviceConfig;
 
     @Autowired
-    public RedisCacheFilterFactory(CacheService cacheService, WebClient.Builder webClientBuilder) {
+    public RedisCacheFilterFactory(CacheService cacheService, WebClient.Builder webClientBuilder, ServiceConfiguration serviceConfig) {
         this.cacheService = cacheService;
         this.webClientBuilder = webClientBuilder;
+        this.serviceConfig = serviceConfig;
     }
 
     @Override
     public GatewayFilter apply(RedisCacheFilterConfig redisCacheFilterConfig) {
         return ((exchange, chain) -> {
-            if (!exchange.getRequest().getMethod().equals(HttpMethod.GET)) return chain.filter(exchange);
 
-            String uri = "localhost:8084" + exchange.getRequest().getPath().toString();
-            String key = uri.substring(uri.lastIndexOf("/") + 1);
+            String service = exchange
+                    .getAttribute("org.springframework.cloud.gateway.support.ServerWebExchangeUtils.gatewayPredicateMatchedPathAttr");
+            if (service == null || !exchange.getRequest().getMethod().equals(HttpMethod.GET)) return chain.filter(exchange);
+
+            String path = exchange.getRequest().getPath().toString();
+            String key = path.substring(path.lastIndexOf("/") + 1);
 
             String cacheResponse = cacheService.getCache(key);
             if (cacheResponse != null) {
@@ -42,16 +48,31 @@ public class RedisCacheFilterFactory extends AbstractGatewayFilterFactory<RedisC
                         .bufferFactory().wrap(cacheResponse.getBytes())));
             }
 
-            String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+            // JWT
+            String jwt = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+
+            StringBuilder uri = new StringBuilder();
+            switch (service) {
+                case "/user/**", "/activation-token/**" -> uri.append(serviceConfig.getUserServiceUri());
+                case "/inventory/**" -> uri.append(serviceConfig.getInventoryServiceUri());
+                case "/order/**" -> uri.append(serviceConfig.getOrderServiceUri());
+                case "/product/**" -> uri.append(serviceConfig.getProductServiceUri());
+            }
+
+            if (uri.isEmpty()) return chain.filter(exchange);
+
+            uri
+                    .append(path);
 
             webClientBuilder.build()
                     .get()
-                    .uri("http://localhost:8084/api/v1/user/" + key)
+                    .uri(uri.toString())
                     .headers(header -> {
                         String data = Instant.now().toString();
-                        header.add(HttpHeaders.AUTHORIZATION, authHeader);
-                        header.add("X-Secure-Data", data);
+                        header.add(HttpHeaders.AUTHORIZATION, jwt);
+                        header.add("X-Secure-Data", data); // Data
                         try {
+                            // Encrypted data for secure origin verification
                             header.add("X-Secure-Origin", SecurityHeader.getEncryptedHeader(data));
                         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
                             throw new RuntimeException(e);
@@ -61,7 +82,6 @@ public class RedisCacheFilterFactory extends AbstractGatewayFilterFactory<RedisC
                     .bodyToMono(String.class)
                     .subscribe(data -> {
                         Cache cache = new Cache(key, data);
-                        System.out.println(data);
                         cacheService.setCache(cache);
                     });
             return chain.filter(exchange);

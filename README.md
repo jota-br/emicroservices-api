@@ -22,7 +22,7 @@ RESTful API for adding and retrieving products, placing orders and authenticated
 
 - API Gateway
     - [ ] Security
-    - [ ] Cache
+    - [x] Cache
 - Product
     - [x] Controller
     - [x] ExceptionHandler

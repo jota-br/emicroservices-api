@@ -7,7 +7,7 @@ import org.springframework.data.redis.core.RedisHash;
 
 import java.io.Serializable;
 
-@RedisHash(value = "Cache", timeToLive = 1L)
+@RedisHash(value = "Cache", timeToLive = 10000L)
 @Getter
 @Setter
 @AllArgsConstructor
