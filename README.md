@@ -52,4 +52,3 @@ RESTful API for adding and retrieving products, placing orders and authenticated
 - Kafka
     - [X] Consumers
     - [X] Producers
-    - [ ] Tests
