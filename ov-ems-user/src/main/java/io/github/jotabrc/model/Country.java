@@ -21,9 +21,10 @@ public class Country {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(length = 40)
+    @Column(length = 40, nullable = false, unique = true)
     private String uuid;
 
+    @Column(nullable = false, unique = true)
     private String name;
 
     @Column(name = "is_active")

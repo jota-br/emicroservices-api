@@ -21,7 +21,7 @@ public class Address {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(length = 40)
+    @Column(length = 40, unique = true, nullable = false)
     private String uuid;
 
     @ManyToOne
@@ -37,7 +37,7 @@ public class Address {
     @Column(length = 50, nullable = false)
     private String number;
 
-    @Column(nullable = false)
+    @Column(length = 50, nullable = false)
     private AddressType type;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)

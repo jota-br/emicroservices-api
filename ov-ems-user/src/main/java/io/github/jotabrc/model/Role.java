@@ -21,7 +21,7 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(length = 40, nullable = false)
+    @Column(length = 40, nullable = false, unique = true)
     private String uuid;
 
     @Column(length = 50, nullable = false, unique = true)

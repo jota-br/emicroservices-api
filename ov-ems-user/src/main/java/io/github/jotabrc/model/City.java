@@ -21,9 +21,10 @@ public class City {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(length = 40)
+    @Column(length = 40, unique = true, nullable = false)
     private String uuid;
 
+    @Column(nullable = false, unique = true)
     private String name;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)

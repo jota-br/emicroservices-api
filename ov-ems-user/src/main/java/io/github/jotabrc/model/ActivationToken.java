@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -22,17 +23,26 @@ public class ActivationToken {
     private long id;
 
     @ValidateExpiration(fieldName = "expiration", expirationHours = 1, message = "Token expired")
+    @Column(nullable = false)
     private LocalDateTime expiration;
+
+
+    @Column(length = 40, nullable = false, unique = true)
+    private String token;
+
+    @Column(name = "user_uuid", length = 40, nullable = false)
+    private String userUuid;
+
+    private boolean used;
 
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @Column(nullable = false, unique = true)
-    private String token;
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
-    @Column(nullable = false)
-    private String userUuid;
-
-    private boolean used;
+    @Version
+    private int version;
 }
