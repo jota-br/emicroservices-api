@@ -16,6 +16,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "tb_user")
+@Table(indexes = {
+        @Index(name = "idx_user_uuid", columnList = "uuid", unique = true),
+        @Index(name = "idx_user_email", columnList = "email", unique = true),
+        @Index(name = "idx_user_username", columnList = "username", unique = true)})
 public class User {
 
     @Id
